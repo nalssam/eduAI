@@ -311,12 +311,7 @@ code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:2px 
     function select(){var r=document.createRange();r.selectNodeContents($('line'));var s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent='복사가 막혀 글자를 선택해 두었습니다. Ctrl+C 를 누르세요';done()}
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){ok.textContent='복사했습니다';done()},select);else select();
   });
-  var dl=$('dl');
-  if(dl)dl.addEventListener('click',function(){
-    var out=C.buildSkill(cfg,DATA.files,brandOf(cfg.brand)),bytes=C.zip(out,cfg.name);
-    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));a.download=cfg.name+'.zip';document.body.appendChild(a);a.click();a.remove();
-    $('saved').hidden=false;$('saved').textContent=cfg.name+'.zip 을 저장했습니다';
-  });
+  /*__SAVE__*/
   draw();
 })();
 </script>
