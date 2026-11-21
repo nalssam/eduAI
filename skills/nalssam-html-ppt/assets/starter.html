@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>날쌤 HTML PPT 스타터</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ═════════ 1. 토큰 — 색·글꼴·간격은 여기서만 바꾼다 ═════════ */
+:root,[data-theme="nalssam"]{
+  --bg:#FBFAF6; --ink:#132C3D; --sub:#586875; --key:#18766B; --key-soft:#E3F0EC;
+  --point:#D9734E; --line:#E4DFD3; --card:#FFFFFF; --paper:#F3F0E8; --zebra:#F5F2EA;
+  --on-key:#FFFFFF; --mute:#C9CED2;
+}
+[data-theme="chalk"]{           /* 칠판: 분필 느낌의 어두운 판 */
+  --bg:#1F3A33; --ink:#F5F2E8; --sub:#B9C9C2; --key:#9FE0CB; --key-soft:rgba(159,224,203,.14);
+  --point:#F6C177; --line:rgba(245,242,232,.2); --card:rgba(255,255,255,.06); --paper:rgba(255,255,255,.09); --zebra:rgba(255,255,255,.05);
+  --on-key:#12302A; --mute:#5E776F;
+}
+[data-theme="navy"]{            /* 간지·강조 장용 */
+  --bg:#132C3D; --ink:#FBFAF6; --sub:#AEBBC4; --key:#7FD1C1; --key-soft:rgba(127,209,193,.14);
+  --point:#F0957A; --line:rgba(251,250,246,.18); --card:rgba(255,255,255,.06); --paper:rgba(255,255,255,.09); --zebra:rgba(255,255,255,.05);
+  --on-key:#132C3D; --mute:#4A6272;
+}
+:root{
+  --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:48px; --s6:64px;   /* 간격은 8의 배수만 */
+  --m:72px;                                                         /* 좌우 여백 */
+  --r:12px; --r-pill:999px;
+  --out:cubic-bezier(.16,1,.3,1); --smooth:cubic-bezier(.4,0,.2,1); --over:cubic-bezier(.34,1.56,.64,1);
+  --dur:.3s;                                                        /* 전환은 0.5초를 넘기지 않는다 */
+}
+
+/* ═════════ 2. 무대 ═════════ */
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#0d1a22;overflow:hidden}
+body{font-family:var(--sans);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+.slide{position:absolute;inset:0;padding:40px var(--m) 64px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;visibility:hidden;opacity:0}
+.slide.on{visibility:visible;opacity:1;z-index:2}
+.slide.out{visibility:visible;opacity:1;z-index:1}
+h1,h2,h3,p,ul,ol,figure,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+p,li,h1,h2,h3{text-wrap:pretty}
+img{display:block;max-width:100%}
+b,strong{font-weight:700}
+em{font-style:normal;color:var(--key);font-weight:700}
+.pt{color:var(--point)}
+.notes{display:none}
+
+/* 머리말: 키커 → 결론 제목 → 부제 */
+.kicker{font-size:20px;font-weight:700;color:var(--key);letter-spacing:.02em;margin-bottom:var(--s2)}
+.title{font-size:52px;font-weight:800;line-height:1.22;letter-spacing:-.02em;max-width:1400px}
+.lead{font-size:24px;line-height:1.5;color:var(--sub);margin-top:var(--s2)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:var(--s4);padding-top:var(--s4)}
+.body.top{justify-content:flex-start}
+
+/* 바닥글(자동) */
+.foot{position:absolute;left:var(--m);right:var(--m);bottom:24px;display:flex;justify-content:space-between;font-size:15px;color:var(--sub);font-variant-numeric:tabular-nums}
+.foot b{font-weight:500}
+#bar{position:absolute;left:0;bottom:0;height:4px;background:var(--key);z-index:5;transition:width var(--dur) var(--out)}
+
+/* ═════════ 3. 부품 ═════════ */
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:var(--s4)}   /* 납작한 둥근 상자, 그림자 없음 */
+.chip{display:inline-flex;align-items:center;height:36px;padding:0 var(--s2);border-radius:var(--r-pill);background:var(--key-soft);color:var(--key);font-size:18px;font-weight:700}
+.chip.pt{background:transparent;border:1.5px solid var(--point);color:var(--point)}
+.band{background:var(--key-soft);border-radius:var(--r);padding:20px var(--s4);font-size:26px;font-weight:600;line-height:1.4}   /* 민트 띠: 한 줄 결론 */
+.band b{color:var(--key)}
+.src{font-size:15px;color:var(--sub)}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s1);border:2px dashed var(--line);border-radius:var(--r);background:var(--paper);color:var(--sub);font-size:18px;text-align:center}
+.ph b{font-size:22px;color:var(--ink)}
+.shot{border-radius:var(--r);border:1.5px solid var(--line);width:100%;height:100%;object-fit:cover}
+.zoom{cursor:zoom-in}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}
+
+/* 표지 */
+.cover{padding:var(--s6) var(--m)}
+.cover .cv{flex:1;display:grid;grid-template-columns:1fr 520px;gap:var(--s6);align-items:center}
+.cover h1{font-size:96px;font-weight:800;line-height:1.12;letter-spacing:-.03em}
+.cover .say{font-size:36px;font-weight:700;line-height:1.4;margin-top:var(--s4)}
+.cover .who{font-size:28px;font-weight:700;color:var(--key);margin-top:var(--s5)}
+.cover .hero{height:520px}
+.cover .rule{position:absolute;left:var(--m);top:var(--s6);height:6px;width:200px;background:var(--ink);transform-origin:left}
+
+/* 간지: 화면 밖으로 나가는 큰 번호 + 작은 라벨 */
+.divider{justify-content:center}
+.divider .num{position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-size:620px;font-weight:900;line-height:.8;color:var(--paper);letter-spacing:-.04em}
+.divider .lbl{font-size:20px;font-weight:700;color:var(--key);letter-spacing:.2em;margin-bottom:var(--s3);position:relative}
+.divider h2{font-size:88px;font-weight:800;line-height:1.15;letter-spacing:-.03em;position:relative;max-width:1100px}
+.divider p{font-size:28px;color:var(--sub);margin-top:var(--s3);position:relative}
+.divider .rule{height:6px;width:200px;background:var(--point);margin-top:var(--s5);transform-origin:left;position:relative}
+
+/* 3열 카드 */
+.cards3 .card{display:flex;flex-direction:column;gap:var(--s2);padding:var(--s3)}
+.cards3 .pic{height:250px}
+.cards3 h3{font-size:30px;font-weight:700;line-height:1.3}
+.cards3 p{font-size:22px;line-height:1.5;color:var(--sub)}
+.cards3 .n{font-size:18px;font-weight:700;color:var(--key)}
+
+/* 한 장 한 메시지: 왼쪽 근거 글, 오른쪽 근거 그림 하나 */
+.msg{display:grid;grid-template-columns:5fr 7fr;gap:var(--s6);align-items:center}
+.msg .big{font-size:120px;font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--key);font-variant-numeric:tabular-nums}
+.msg .cap{font-size:28px;line-height:1.5;margin-top:var(--s3)}
+.msg .cap small{display:block;font-size:20px;color:var(--sub);margin-top:var(--s1)}
+
+/* 막대 차트: 큰 순서로 정렬, 말할 막대 하나만 키컬러 */
+.bars{display:flex;flex-direction:column;gap:var(--s2)}
+.bars li{display:grid;grid-template-columns:220px 1fr 96px;align-items:center;gap:var(--s2);font-size:24px}
+.bars .t{color:var(--sub);text-align:right}
+.bars .b{height:40px;border-radius:6px;background:var(--mute);width:calc(var(--v)*1%);transform-origin:left;transform:scaleX(0);transition:transform .8s var(--out)}
+.bars .v{font-weight:700;font-variant-numeric:tabular-nums;color:var(--sub)}
+.bars .hl .t,.bars .hl .v{color:var(--ink);font-weight:700}
+.bars .hl .b{background:var(--key)}
+.on .bars .b{transform:scaleX(1)}
+.on .bars li:nth-child(2) .b{transition-delay:.06s}.on .bars li:nth-child(3) .b{transition-delay:.12s}
+.on .bars li:nth-child(4) .b{transition-delay:.18s}.on .bars li:nth-child(5) .b{transition-delay:.24s}
+
+/* 큰 숫자 셋 */
+.stats .card{padding:var(--s5) var(--s4)}
+.stats .n{font-size:104px;font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stats .n small{font-size:.4em;font-weight:700;margin-left:4px;letter-spacing:0}
+.stats .card:first-child .n{color:var(--key)}
+.stats .l{font-size:26px;font-weight:700;margin-top:var(--s3)}
+.stats .d{font-size:20px;color:var(--sub);margin-top:var(--s1);line-height:1.5}
+
+/* 사진 + 글 (1:2 — 반반은 초점이 흐려진다) */
+.split{display:grid;grid-template-columns:1fr 2fr;gap:var(--s6);align-items:center;height:100%}
+.split.rev{grid-template-columns:2fr 1fr}
+.split .pic{height:520px}
+.split .tx p{font-size:28px;line-height:1.6}
+.split .tx p+p{margin-top:var(--s3)}
+
+/* 번호 목록 */
+.nlist{display:flex;flex-direction:column}
+.nlist li{display:grid;grid-template-columns:140px 1fr;align-items:baseline;padding:var(--s3) 0;border-bottom:1.5px solid var(--line)}
+.nlist li:first-child{border-top:3px solid var(--ink)}
+.nlist .n{font-size:64px;font-weight:200;line-height:1;color:var(--mute);font-variant-numeric:tabular-nums}
+.nlist b{font-size:34px;font-weight:700}
+.nlist span{display:block;font-size:22px;color:var(--sub);margin-top:var(--s1)}
+.nlist li.hl .n{color:var(--key)}
+
+/* 타임라인 4칸 */
+.tl{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}
+.tl::before{content:"";position:absolute;left:0;right:0;top:19px;border-top:3px dotted var(--line)}
+.tl .y{display:inline-block;position:relative;background:var(--bg);padding-right:var(--s2);font-size:26px;font-weight:800;color:var(--key)}
+.tl .y::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--key);margin-right:var(--s1)}
+.tl h3{font-size:28px;font-weight:700;margin-top:var(--s3)}
+.tl p{font-size:21px;line-height:1.5;color:var(--sub);margin-top:var(--s1)}
+.tl li:last-child .y{color:var(--point)}.tl li:last-child .y::before{background:var(--point)}
+
+/* 비교표 */
+.tbl{width:100%;border-collapse:collapse;font-size:24px}
+.tbl th{text-align:left;font-size:20px;font-weight:700;color:var(--sub);padding:var(--s2);border-bottom:3px solid var(--ink)}
+.tbl td{padding:20px var(--s2);border-bottom:1.5px solid var(--line);line-height:1.4}
+.tbl tr:nth-child(even) td{background:var(--zebra)}
+.tbl td:first-child{font-weight:700;width:240px}
+.tbl .k{font-weight:700;color:var(--key)}
+
+/* 단계 카드 */
+.steps .card{position:relative;padding:var(--s3)}
+.steps .n{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--key);color:var(--on-key);font-size:24px;font-weight:800}
+.steps h3{font-size:28px;font-weight:700;margin-top:var(--s2)}
+.steps p{font-size:21px;line-height:1.5;color:var(--sub);margin-top:var(--s1)}
+.steps .card:last-child .n{background:var(--point)}
+
+/* 인용 */
+.quote{display:grid;grid-template-columns:1fr 2fr;gap:var(--s6);align-items:center}
+.quote .pic{height:440px}
+.quote blockquote{font-size:44px;font-weight:700;line-height:1.45;letter-spacing:-.01em}
+.quote blockquote::before{content:"“";display:block;font-size:120px;line-height:.6;color:var(--key);margin-bottom:var(--s2)}
+.quote .chips{display:flex;align-items:center;gap:var(--s1);margin-top:var(--s4);color:var(--sub);font-size:22px}
+
+/* 전·후 대비 (좌우 색이 갈린다) */
+.vs{padding:0;flex-direction:row}
+.vs>.before,.vs>.after{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--m);background:var(--bg);color:var(--ink)}
+.vs .lbl{font-size:20px;font-weight:700;letter-spacing:.2em;color:var(--sub);margin-bottom:var(--s3)}
+.vs h3{font-size:64px;font-weight:300;line-height:1.2;letter-spacing:-.02em}
+.vs .after h3{font-weight:800}
+.vs p{font-size:24px;line-height:1.5;color:var(--sub);margin-top:var(--s3)}
+.vs .mid{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:var(--point);flex:none;padding:0}
+.vs .foot span{visibility:hidden}
+
+/* 콜아웃: 캡처에서 한 곳만 짚는다 */
+.callout{position:relative;height:100%}
+.callout .ring{position:absolute;border:4px solid var(--point);border-radius:10px;box-shadow:0 0 0 2000px rgba(19,44,61,.45)}
+.callout .tag{position:absolute;background:var(--point);color:#fff;font-size:22px;font-weight:700;padding:8px 16px;border-radius:var(--r-pill);white-space:nowrap}
+.callout .frame{position:relative;height:100%;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line)}
+
+/* 전면 이미지 */
+.full{padding:0}
+.full>img,.full>.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0;border:0}
+.full .scrim{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(transparent,rgba(10,20,28,.78))}
+.full .cap{position:absolute;left:var(--m);bottom:var(--s6);right:var(--m);color:#fff;font-size:56px;font-weight:800;line-height:1.25;letter-spacing:-.02em}
+
+/* 참고문헌 · 감사 */
+.refs li{font-size:22px;line-height:1.5;padding:12px 0;border-bottom:1.5px solid var(--line);color:var(--sub)}
+.refs li b{color:var(--ink)}
+.thanks .cv{flex:1;display:grid;grid-template-columns:1fr 360px;gap:var(--s6);align-items:center}
+.thanks h2{font-size:104px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.thanks .say{font-size:34px;font-weight:600;line-height:1.5;margin-top:var(--s4)}
+.thanks .who{font-size:26px;font-weight:700;color:var(--key);margin-top:var(--s5)}
+.qr{padding:var(--s3);text-align:center}
+.qr .ph,.qr img{width:100%;aspect-ratio:1}
+.qr p{font-size:20px;font-weight:700;margin-top:var(--s2)}
+
+/* ═════════ 4. 움직임 — 등장은 한 가지(아래에서 위로), 간격 60ms, 전체 0.8초 안 ═════════ */
+[data-step]{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--out),transform .5s var(--out)}
+[data-step].shown{opacity:1;transform:none}
+[data-fx="fade"]{transform:none}
+[data-fx="pop"]{transform:scale(.9)}[data-fx="pop"].shown{transition-timing-function:var(--out),var(--over)}
+.stag>*{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--out),transform .5s var(--out);transition-delay:calc(var(--i,0)*60ms)}
+.on .stag:not([data-step])>*,.stag.shown>*{opacity:1;transform:none}
+.stag[data-step]{opacity:1;transform:none}
+.grow{transform:scaleX(0);transition:transform .6s var(--out) .25s}.on .grow{transform:scaleX(1)}
+.kin span{display:inline-block;opacity:0;transform:translateY(.5em);transition:opacity .35s var(--out),transform .5s var(--out);transition-delay:calc(var(--i)*45ms)}
+.on .kin span{opacity:1;transform:none}
+/* 장 전환: 기본은 페이드 하나. 간지처럼 크게 바뀌는 곳에만 data-tr 를 붙인다 */
+.slide.on{animation:tr-fade var(--dur) var(--smooth) both}
+.slide.on[data-tr="wipe"]{animation:tr-wipe .45s var(--out) both}
+.slide.on[data-tr="circle"]{animation:tr-circle .5s var(--out) both}
+.slide.on[data-tr="slice"]{animation:tr-slice .45s var(--out) both}
+@keyframes tr-fade{from{opacity:0}}
+@keyframes tr-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tr-circle{from{clip-path:circle(0% at 50% 50%)}to{clip-path:circle(120% at 50% 50%)}}
+@keyframes tr-slice{from{clip-path:polygon(0 0,0 0,-20% 100%,-20% 100%)}to{clip-path:polygon(0 0,120% 0,100% 100%,-20% 100%)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:1ms!important;transition-delay:0s!important;animation-duration:1ms!important}}
+
+/* ═════════ 5. 발표 도구 ═════════ */
+#hud{position:fixed;right:16px;bottom:16px;z-index:30;display:flex;gap:6px;opacity:0;transition:opacity .3s}
+body.move #hud{opacity:1}
+#hud button{width:44px;height:44px;border:0;border-radius:10px;background:rgba(19,44,61,.82);color:#fff;font:600 18px var(--sans);cursor:pointer}
+#hud button:hover{background:#18766B}
+#np{position:fixed;left:0;right:0;bottom:0;z-index:25;max-height:38vh;overflow:auto;background:rgba(13,26,34,.95);color:#F1EFE8;padding:20px 28px 24px;font:400 20px/1.7 var(--sans);white-space:pre-wrap;display:none}
+#np.on{display:block}
+#np h4{margin:0 0 8px;font-size:15px;font-weight:700;color:#7FD1C1;letter-spacing:.06em}
+#ov{position:fixed;inset:0;z-index:40;background:rgba(13,26,34,.96);overflow:auto;padding:32px;display:none}
+#ov.on{display:block}
+#ov ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:0;padding:0;list-style:none}
+#ov li{background:#FBFAF6;color:#132C3D;border-radius:10px;padding:14px 16px;min-height:92px;cursor:pointer;font:700 17px/1.4 var(--sans);border:3px solid transparent}
+#ov li.cur{border-color:#D9734E}
+#ov li i{display:block;font:500 13px var(--sans);color:#586875;font-style:normal;margin-bottom:6px}
+#help{position:fixed;inset:0;z-index:45;background:rgba(13,26,34,.92);color:#F1EFE8;display:none;align-items:center;justify-content:center;font:400 20px/2 var(--sans)}
+#help.on{display:flex}
+#help kbd{display:inline-block;min-width:36px;text-align:center;padding:0 10px;margin-right:12px;border-radius:6px;background:#F1EFE8;color:#132C3D;font:700 16px/30px var(--sans)}
+#lb{position:fixed;inset:0;z-index:50;background:rgba(13,26,34,.9);display:none;align-items:center;justify-content:center;cursor:zoom-out}
+#lb.on{display:flex}#lb img{max-width:92vw;max-height:90vh;border-radius:12px}
+
+/* 인쇄·PDF: 한 장이 한 쪽, 모든 단계가 보인 상태 */
+@media print{
+  @page{size:1600px 900px;margin:0}
+  html,body{height:auto;overflow:visible;background:none}
+  #stage{position:static;transform:none!important;width:1600px;height:auto;overflow:visible}
+  .slide{position:relative;visibility:visible!important;opacity:1!important;height:900px;break-after:page;animation:none!important}
+  [data-step],.stag>*,.kin span{opacity:1!important;transform:none!important}
+  .grow,.bars .b{transform:none!important}
+  #hud,#np,#ov,#help,#lb,#bar{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- 덱 정보: 바닥글이 여기서 만들어진다. data-theme 은 nalssam(기본) · chalk · navy -->
+<div id="stage" data-theme="nalssam" data-event="날쌤 HTML PPT 견본" data-author="nalssam 박준호" data-date="2026. 11. 21.(토)">
+
+<!-- 01 표지 -->
+<section class="slide cover" data-title="표지">
+  <i class="rule grow"></i>
+  <div class="cv">
+    <div>
+      <h1 class="kin">말하듯 넘기는<br>한 장짜리 발표</h1>
+      <p class="say" data-step="1">내용만 쓰면 얼굴은 늘 같아요</p>
+      <p class="who" data-step="1">견본 덱 · 장표 유형 18가지</p>
+    </div>
+    <div class="ph hero" data-step="1" data-fx="fade"><b>표지 그림 자리</b>01_표지 · 4:3 클레이 오브젝트</div>
+  </div>
+  <aside class="notes">1장 · 1분
+안녕하세요. 이 덱은 날쌤 HTML PPT 스킬의 견본입니다. 장마다 이렇게 대본이 붙어 있고, N 키를 누르면 보입니다.</aside>
+</section>
+
+<!-- 02 오늘의 질문 (3열 카드) -->
+<section class="slide" data-title="오늘의 질문">
+  <div class="kicker">01 시작</div>
+  <h2 class="title">오늘은 세 가지만 가져가면 돼요</h2>
+  <p class="lead">제목은 이름표가 아니라 결론 한 문장으로 씁니다</p>
+  <div class="body">
+    <div class="g3 cards3 stag">
+      <div class="card"><div class="ph pic"><b>그림 자리</b>02_질문1</div><span class="n">Q1</span><h3>무엇을 말할까</h3><p>한 장에 메시지 하나만 남겨요</p></div>
+      <div class="card"><div class="ph pic"><b>그림 자리</b>02_질문2</div><span class="n">Q2</span><h3>어떻게 보일까</h3><p>크기와 여백으로 순서를 만들어요</p></div>
+      <div class="card"><div class="ph pic"><b>그림 자리</b>02_질문3</div><span class="n">Q3</span><h3>언제 움직일까</h3><p>읽는 순서가 있을 때만 움직여요</p></div>
+    </div>
+  </div>
+  <aside class="notes">2장 · 2분
+오늘 가져갈 것은 세 가지입니다. 무엇을 말할지, 어떻게 보일지, 언제 움직일지. 이 세 가지만 가져가시면 됩니다.</aside>
+</section>
+
+<!-- 03 간지 -->
+<section class="slide divider" data-title="간지 · 구성" data-theme="navy" data-tr="wipe">
+  <div class="num">01</div>
+  <div class="lbl">PART 01</div>
+  <h2 class="kin">무엇을 말할까</h2>
+  <p data-step="1">한 장에는 결론 하나와 근거 하나</p>
+  <i class="rule grow"></i>
+  <aside class="notes">3장 · 30초
+첫 번째 이야기입니다. 한 장에 무엇을 말할지부터 정합니다.</aside>
+</section>
+
+<!-- 04 한 장 한 메시지 -->
+<section class="slide" data-title="한 장 한 메시지">
+  <div class="kicker">01 구성</div>
+  <h2 class="title">주문의 절반이 아침 8시에 몰려요</h2>
+  <p class="lead">결론 제목 + 숫자 하나 + 그림 하나 (가상 예시)</p>
+  <div class="body">
+    <div class="msg">
+      <div>
+        <div class="big"><span data-count="52">0</span>%</div>
+        <p class="cap">평일 오전 주문 1,240건 가운데 절반<small>(가상) 골목 카페 1년 돌아보기</small></p>
+      </div>
+      <ul class="bars">
+        <li><span class="t">7시</span><i class="b" style="--v:38"></i><span class="v">18%</span></li>
+        <li class="hl"><span class="t">8시</span><i class="b" style="--v:100"></i><span class="v">52%</span></li>
+        <li><span class="t">9시</span><i class="b" style="--v:42"></i><span class="v">21%</span></li>
+        <li><span class="t">10시</span><i class="b" style="--v:18"></i><span class="v">9%</span></li>
+      </ul>
+    </div>
+    <div class="band" data-step="1">그래서 <b>8시 전 예약 주문</b>을 먼저 엽니다</div>
+  </div>
+  <aside class="notes">4장 · 2분
+제목이 곧 결론입니다. 주문의 절반이 아침 8시에 몰립니다. 화면의 숫자는 가상 예시입니다.</aside>
+</section>
+
+<!-- 05 차트 -->
+<section class="slide" data-title="정렬한 막대 차트">
+  <div class="kicker">01 구성</div>
+  <h2 class="title">아이스 아메리카노가 3잔 중 1잔이에요</h2>
+  <p class="lead">큰 순서로 정렬하고, 말할 막대 하나만 색을 씁니다 (가상 예시)</p>
+  <div class="body">
+    <ul class="bars">
+      <li class="hl"><span class="t">아이스 아메리카노</span><i class="b" style="--v:100"></i><span class="v">34%</span></li>
+      <li><span class="t">카페 라테</span><i class="b" style="--v:65"></i><span class="v">22%</span></li>
+      <li><span class="t">오트 라테</span><i class="b" style="--v:50"></i><span class="v">17%</span></li>
+      <li><span class="t">콜드브루</span><i class="b" style="--v:44"></i><span class="v">15%</span></li>
+      <li><span class="t">말차 라테</span><i class="b" style="--v:35"></i><span class="v">12%</span></li>
+    </ul>
+    <p class="src">(가상) 메뉴별 판매 비율 · 값은 막대 끝 숫자로도 표시</p>
+  </div>
+  <aside class="notes">5장 · 2분
+차트는 큰 순서로 정렬하고, 말하고 싶은 막대 하나만 색을 칠합니다. 아이스 아메리카노가 세 잔 중 한 잔입니다.</aside>
+</section>
+
+<!-- 06 큰 숫자 셋 -->
+<section class="slide" data-title="큰 숫자 셋">
+  <div class="kicker">01 구성</div>
+  <h2 class="title">숫자는 셋까지만 크게 보여 줘요</h2>
+  <div class="body">
+    <div class="g3 stats stag">
+      <div class="card"><div class="n"><span data-count="12400">0</span><small>잔</small></div><div class="l">올해 판매</div><div class="d">(가상) 하루 평균 34잔</div></div>
+      <div class="card"><div class="n"><span data-count="4.8" data-dec="1">0</span></div><div class="l">평균 별점</div><div class="d">(가상) 후기 620건 기준</div></div>
+      <div class="card"><div class="n"><span data-count="38">0</span><small>%</small></div><div class="l">앱 주문 비율</div><div class="d">(가상) 지난해보다 늘었어요</div></div>
+    </div>
+    <div class="band" data-step="1">문단 속 숫자는 읽어야 보이고, <b>큰 숫자 셋</b>은 보기만 해도 남아요</div>
+  </div>
+  <aside class="notes">6장 · 1분 30초
+숫자는 셋까지만 크게 보여 줍니다. 열 개를 다 그리지 말고 고르는 것이 먼저입니다.</aside>
+</section>
+
+<!-- 07 사진 + 글 -->
+<section class="slide" data-title="사진과 글">
+  <div class="kicker">02 배치</div>
+  <h2 class="title">반반보다 1대 2가 주인공을 살려요</h2>
+  <div class="body">
+    <div class="split">
+      <div class="ph pic"><b>사진 자리</b>07_교실 · 3:4</div>
+      <div class="tx">
+        <p>반반으로 나누면 두 쪽의 무게가 같아 <em>무엇이 주인공인지</em> 흐려져요.</p>
+        <p data-step="1">주인공 쪽을 넓게 주면 시선이 먼저 갑니다.</p>
+        <p data-step="2" class="pt"><b>글이 주인공이면 글을 2로 둡니다.</b></p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">7장 · 1분 30초
+사진과 글을 나눌 때는 반반보다 일 대 이가 좋습니다. 주인공 쪽을 넓게 줍니다.</aside>
+</section>
+
+<!-- 08 번호 목록 -->
+<section class="slide" data-title="번호 목록">
+  <div class="kicker">02 배치</div>
+  <h2 class="title">세 단계면 한 장이 정리돼요</h2>
+  <div class="body">
+    <ol class="nlist">
+      <li class="hl" data-step="1"><span class="n">01</span><div><b>결론을 제목에 쓴다</b><span>"현황"·"분석" 같은 이름표 제목은 쓰지 않아요</span></div></li>
+      <li data-step="2"><span class="n">02</span><div><b>근거를 하나만 남긴다</b><span>나머지는 다음 장으로 보내요</span></div></li>
+      <li data-step="3"><span class="n">03</span><div><b>여백을 두 배로 늘린다</b><span>내용을 빼기 전에 간격부터 넓혀요</span></div></li>
+    </ol>
+  </div>
+  <aside class="notes">8장 · 2분
+세 단계입니다. 결론을 제목에 쓰고, 근거를 하나만 남기고, 여백을 두 배로 늘립니다.</aside>
+</section>
+
+<!-- 09 타임라인 -->
+<section class="slide" data-title="타임라인">
+  <div class="kicker">02 배치</div>
+  <h2 class="title">네 칸으로 흐름을 보여 줘요</h2>
+  <p class="lead">마지막 칸만 포인트 색 · 연도가 발표자 정리면 각주에 밝힙니다</p>
+  <div class="body">
+    <ol class="tl stag">
+      <li><span class="y">1단계</span><h3>내용 받기</h3><p>글이나 자료를 먼저 받아요</p></li>
+      <li><span class="y">2단계</span><h3>장 목록</h3><p>결론 문장으로 목록을 짜요</p></li>
+      <li><span class="y">3단계</span><h3>조립</h3><p>견본 장을 복사해 채워요</p></li>
+      <li><span class="y">4단계</span><h3>점검</h3><p>전체 화면을 눈으로 봐요</p></li>
+    </ol>
+    <p class="src">※ 발표자 정리</p>
+  </div>
+  <aside class="notes">9장 · 1분 30초
+흐름은 네 칸으로 보여 줍니다. 마지막 칸만 색을 달리해 도착점을 알립니다.</aside>
+</section>
+
+<!-- 10 비교표 -->
+<section class="slide" data-title="비교표">
+  <div class="kicker">02 배치</div>
+  <h2 class="title">표는 핵심 열 하나만 진하게 써요</h2>
+  <div class="body">
+    <table class="tbl">
+      <tr><th>구분</th><th>PPTX</th><th>HTML PPT</th></tr>
+      <tr><td>결과물</td><td>파워포인트 파일</td><td class="k">브라우저로 여는 파일 하나</td></tr>
+      <tr><td>움직임</td><td>쓰지 않음</td><td class="k">등장·전환·숫자 올라가기</td></tr>
+      <tr><td>대본</td><td>슬라이드 메모</td><td class="k">N 키로 보는 대본 창</td></tr>
+      <tr><td>나누기</td><td>파일 보내기</td><td class="k">링크 하나 또는 PDF</td></tr>
+    </table>
+    <div class="band" data-step="1">같은 얼굴, <b>다른 그릇</b>이에요</div>
+  </div>
+  <aside class="notes">10장 · 2분
+표는 핵심 열 하나만 진하게 씁니다. 같은 얼굴에 그릇만 다릅니다.</aside>
+</section>
+
+<!-- 11 단계 카드 -->
+<section class="slide" data-title="단계 카드">
+  <div class="kicker">03 움직임</div>
+  <h2 class="title">움직임은 네 가지 약속만 지켜요</h2>
+  <div class="body">
+    <div class="g4 steps">
+      <div class="card" data-step="1"><span class="n">1</span><h3>하나로 통일</h3><p>전환은 페이드 하나, 0.3초</p></div>
+      <div class="card" data-step="2"><span class="n">2</span><h3>짧은 시차</h3><p>60ms 간격, 0.8초 안에 끝</p></div>
+      <div class="card" data-step="3"><span class="n">3</span><h3>한 문장만</h3><p>글자 등장은 표지와 간지에만</p></div>
+      <div class="card" data-step="4"><span class="n">4</span><h3>끌 수 있게</h3><p>움직임 줄이기 설정을 따라요</p></div>
+    </div>
+  </div>
+  <aside class="notes">11장 · 2분
+움직임은 네 가지만 지킵니다. 하나로 통일하고, 시차는 짧게, 글자 등장은 한 문장만, 그리고 끌 수 있게 합니다.</aside>
+</section>
+
+<!-- 12 인용 -->
+<section class="slide" data-title="인용">
+  <div class="kicker">03 움직임</div>
+  <h2 class="title">전환은 내용이 아니라 이음새예요</h2>
+  <div class="body">
+    <div class="quote">
+      <div class="ph pic"><b>그림 자리</b>12_이음새</div>
+      <div>
+        <blockquote>한 발표 안에서는<br>한 가지로 통일하고,<br>크게 바뀌는 곳에만 다르게.</blockquote>
+        <div class="chips" data-step="1"><span class="chip">본문 = 페이드</span>›<span class="chip">간지 = 닦아내기</span>›<span class="chip pt">0.5초 이내</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">12장 · 1분
+전환은 내용이 아니라 이음새입니다. 한 가지로 통일하고, 간지처럼 크게 바뀌는 곳에만 다르게 씁니다.</aside>
+</section>
+
+<!-- 13 전·후 대비 -->
+<section class="slide vs" data-title="전후 대비" data-tr="slice">
+  <div class="before" data-theme="navy"><div class="lbl">BEFORE</div><h3>이름표 제목<br>글머리표 일곱 줄</h3><p>무엇을 말하려는지 끝까지 읽어야 알아요</p></div>
+  <div class="after"><div class="lbl">AFTER</div><h3>결론 제목<br><em>근거 하나</em></h3><p>1초만 봐도 한 가지가 남아요</p></div>
+  <i class="mid"></i>
+  <aside class="notes">13장 · 1분
+전과 후입니다. 이름표 제목과 글머리표 일곱 줄이, 결론 제목과 근거 하나로 바뀝니다.</aside>
+</section>
+
+<!-- 14 콜아웃 -->
+<section class="slide" data-title="콜아웃">
+  <div class="kicker">04 화면</div>
+  <h2 class="title">캡처는 한 곳만 짚어 줘요</h2>
+  <div class="body top">
+    <div class="callout">
+      <div class="frame"><div class="ph" style="position:absolute;inset:0;border:0"><b>화면 캡처 자리</b>14_화면 · 16:9 · 개인정보는 가리기</div>
+        <i class="ring" data-step="1" data-fx="fade" style="left:62%;top:18%;width:22%;height:16%"></i>
+      </div>
+      <span class="tag" data-step="1" style="left:62%;top:38%">여기서 시작해요</span>
+    </div>
+  </div>
+  <aside class="notes">14장 · 1분 30초
+화면 캡처를 그대로 붙이면 어디를 봐야 할지 모릅니다. 한 곳만 짚고 나머지는 어둡게 합니다.</aside>
+</section>
+
+<!-- 15 전면 이미지 -->
+<section class="slide full" data-title="전면 이미지" data-nofoot>
+  <div class="ph"><b>전면 그림 자리</b>15_장면 · 16:9</div>
+  <div class="scrim"></div>
+  <div class="cap">끝까지 찬 사진은 자료가 아니라 장면이에요</div>
+  <aside class="notes">15장 · 1분
+여백 안의 사진은 자료이고, 끝까지 찬 사진은 장면입니다. 글자 아래쪽만 어둡게 깝니다.</aside>
+</section>
+
+<!-- 16 칠판 테마 견본 -->
+<section class="slide" data-title="칠판 테마" data-theme="chalk">
+  <div class="kicker">05 테마</div>
+  <h2 class="title">칠판 테마는 한 장에만 써도 돼요</h2>
+  <p class="lead">장에 data-theme="chalk" 를 붙이면 그 장만 바뀝니다</p>
+  <div class="body">
+    <div class="g3 cards3 stag">
+      <div class="card"><span class="n">nalssam</span><h3>웜 오프화이트</h3><p>기본. 연수와 수업에 써요</p></div>
+      <div class="card"><span class="n">chalk</span><h3>칠판</h3><p>질문·활동 장에 어울려요</p></div>
+      <div class="card"><span class="n">navy</span><h3>네이비</h3><p>간지와 강조 장에 써요</p></div>
+    </div>
+    <div class="band" data-step="1">색 이름이 아니라 <b>역할 이름</b>으로 바꿔요: --key · --point</div>
+  </div>
+  <aside class="notes">16장 · 1분
+테마는 세 가지입니다. 장 하나에만 붙여도 그 장만 바뀝니다.</aside>
+</section>
+
+<!-- 17 참고문헌 -->
+<section class="slide" data-title="참고문헌">
+  <div class="kicker">참고</div>
+  <h2 class="title">출처는 한 장에 모아요</h2>
+  <div class="body top">
+    <ul class="refs">
+      <li><b>Design in words</b> — UI 디자인 용어 97 · designinwords.onpod.ai</li>
+      <li><b>Remotion Scenes</b> — lifeprompt-team/remotion-scenes (MIT)</li>
+      <li><b>ko/design.md</b> — 한국 서비스 디자인 카탈로그 · getdesign.kr</li>
+      <li>그림 속 상표는 각 기업 소유 · 수치 예시는 모두 가상</li>
+    </ul>
+  </div>
+  <aside class="notes">17장 · 30초
+출처는 화면으로 대신하겠습니다. 이 견본의 수치는 모두 가상 예시입니다.</aside>
+</section>
+
+<!-- 18 감사 -->
+<section class="slide thanks" data-title="감사" data-nofoot>
+  <div class="cv">
+    <div>
+      <h2 class="kin">감사합니다</h2>
+      <p class="say" data-step="1">내일 한 장만 바꿔 보세요</p>
+      <p class="who" data-step="1">nalssam 박준호</p>
+    </div>
+    <div class="card qr" data-step="1" data-fx="pop"><div class="ph"><b>QR 자리</b>18_QR</div><p>자료 받기</p></div>
+  </div>
+  <aside class="notes">18장 · 1분
+들어 주셔서 감사합니다. 내일 한 장만 바꿔 보시면 좋겠습니다. 자료는 화면의 QR에서 받으실 수 있습니다.</aside>
+</section>
+
+<i id="bar"></i>
+</div>
+
+<div id="hud"><button data-a="prev" title="이전">‹</button><button data-a="next" title="다음">›</button><button data-a="ov" title="목록 (G)">▦</button><button data-a="notes" title="대본 (N)">N</button><button data-a="full" title="전체 화면 (F)">⛶</button><button data-a="help" title="도움말 (?)">?</button></div>
+<div id="np"></div>
+<div id="ov"><ol></ol></div>
+<div id="help"><div><kbd>→</kbd><kbd>Space</kbd>다음 단계 · 다음 장<br><kbd>←</kbd>이전<br><kbd>PgDn</kbd><kbd>PgUp</kbd>장 단위로 넘기기<br><kbd>숫자</kbd><kbd>Enter</kbd>그 장으로<br><kbd>G</kbd>목록 &nbsp; <kbd>N</kbd>대본 &nbsp; <kbd>F</kbd>전체 화면 &nbsp; <kbd>P</kbd>인쇄·PDF</div></div>
+<div id="lb"><img alt=""></div>
+
+<script>
+/* 날쌤 HTML PPT 엔진 — 고치지 않는다. 장은 위 <section> 만 바꾼다. */
+(function(){
+  var stage=document.getElementById('stage'),S=[].slice.call(stage.querySelectorAll('.slide')),N=S.length,cur=-1,step=0,num='';
+  var bar=document.getElementById('bar'),np=document.getElementById('np'),ov=document.getElementById('ov'),help=document.getElementById('help'),lb=document.getElementById('lb');
+  function fit(){var k=Math.min(innerWidth/1600,innerHeight/900);stage.style.transform='scale('+k+') translate(-50%,-50%)'}
+  addEventListener('resize',fit);fit();
+  function pad(n){return (n<10?'0':'')+n}
+  S.forEach(function(s,i){
+    s.dataset.n=i+1;
+    if(!s.hasAttribute('data-nofoot')&&!s.classList.contains('cover')){
+      var f=document.createElement('div');f.className='foot';
+      var d=stage.dataset,t=[d.event,d.author,d.date].filter(Boolean).join('  |  ');
+      f.innerHTML='<span></span><b>'+pad(i+1)+' / '+pad(N)+'</b>';f.firstChild.textContent=t;s.appendChild(f);
+    }
+    [].forEach.call(s.querySelectorAll('.stag'),function(g){[].forEach.call(g.children,function(c,j){c.style.setProperty('--i',j)})});
+    [].forEach.call(s.querySelectorAll('.kin'),function(k){var i=0,n=k.textContent.replace(/\s/g,'').length,cap=Math.min(1,20/Math.max(n,1));
+      [].slice.call(k.childNodes).forEach(function(nd){if(nd.nodeType!==3)return;var fr=document.createDocumentFragment();
+        nd.textContent.split('').forEach(function(ch){if(ch===' '){fr.appendChild(document.createTextNode(' '));return}var sp=document.createElement('span');sp.textContent=ch;sp.style.setProperty('--i',(i++*cap).toFixed(2));fr.appendChild(sp)});
+        k.replaceChild(fr,nd)})});
+    var li=document.createElement('li');li.innerHTML='<i>'+pad(i+1)+'</i>';li.appendChild(document.createTextNode(s.dataset.title||''));li.onclick=function(){ov.classList.remove('on');go(i,0)};ov.firstElementChild.appendChild(li);
+  });
+  function steps(s){var m=0;[].forEach.call(s.querySelectorAll('[data-step]'),function(e){m=Math.max(m,+e.dataset.step)});return m}
+  function paint(){var s=S[cur];[].forEach.call(s.querySelectorAll('[data-step]'),function(e){var on=+e.dataset.step<=step,was=e.classList.contains('shown');e.classList.toggle('shown',on);if(on&&!was)count(e)})}
+  function count(root){[].forEach.call(root.querySelectorAll('[data-count]'),function(e){
+    if(e.closest('[data-step]:not(.shown)'))return;var to=+e.dataset.count,dec=+(e.dataset.dec||0),t0=performance.now(),D=900;
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){e.textContent=fmt(to,dec);return}
+    (function tick(t){var p=Math.min(1,(t-t0)/D),v=to*(1-Math.pow(1-p,4));e.textContent=fmt(v,dec);if(p<1)requestAnimationFrame(tick)})(t0)})}
+  function fmt(v,dec){return dec?v.toFixed(dec):Math.round(v).toLocaleString('ko-KR')}
+  function go(i,st){i=Math.max(0,Math.min(N-1,i));
+    if(i!==cur){var old=S[cur];S.forEach(function(s){s.classList.remove('out')});if(old){old.classList.remove('on');old.classList.add('out');setTimeout(function(){old.classList.remove('out')},520)}
+      cur=i;step=st===-1?steps(S[i]):(st||0);S[i].classList.add('on');paint();count(S[i]);
+    }else{step=st||0;paint()}
+    bar.style.width=((cur+1)/N*100)+'%';try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+    var n=S[cur].querySelector('.notes');np.innerHTML='<h4>'+pad(cur+1)+' / '+pad(N)+' · '+(S[cur].dataset.title||'')+'</h4>';np.appendChild(document.createTextNode(n?n.textContent.trim():'(대본 없음)'));
+    [].forEach.call(ov.querySelectorAll('li'),function(l,j){l.classList.toggle('cur',j===cur)});
+  }
+  function next(){if(step<steps(S[cur])){step++;paint()}else go(cur+1,0)}
+  function prev(){if(step>0){step--;paint()}else go(cur-1,-1)}
+  function full(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+  var act={next:next,prev:prev,ov:function(){ov.classList.toggle('on')},notes:function(){np.classList.toggle('on')},full:full,help:function(){help.classList.toggle('on')}};
+  addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;var k=e.key;
+    if(lb.classList.contains('on')){lb.classList.remove('on');return}
+    if(k==='Escape'){ov.classList.remove('on');help.classList.remove('on');np.classList.remove('on');num='';return}
+    if(/^[0-9]$/.test(k)){num+=k;return}
+    if(k==='Enter'&&num){go(+num-1,0);num='';return}
+    if(k==='ArrowRight'||k===' '||k==='Enter'){e.preventDefault();next()}
+    else if(k==='ArrowLeft'||k==='Backspace'){e.preventDefault();prev()}
+    else if(k==='ArrowDown'||k==='PageDown'){e.preventDefault();go(cur+1,0)}
+    else if(k==='ArrowUp'||k==='PageUp'){e.preventDefault();go(cur-1,0)}
+    else if(k==='Home')go(0,0);else if(k==='End')go(N-1,0);
+    else if(k==='g'||k==='G')act.ov();else if(k==='n'||k==='N')act.notes();else if(k==='f'||k==='F')full();
+    else if(k==='p'||k==='P')print();else if(k==='?')act.help();
+  });
+  document.getElementById('hud').addEventListener('click',function(e){var b=e.target.closest('button');if(b)act[b.dataset.a]()});
+  help.onclick=function(){help.classList.remove('on')};lb.onclick=function(){lb.classList.remove('on')};
+  stage.addEventListener('click',function(e){var im=e.target.closest('img.zoom');if(im){lb.firstElementChild.src=im.currentSrc||im.src;lb.classList.add('on')}});
+  var tx=0,mt;addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)(d<0?next:prev)()},{passive:true});
+  addEventListener('mousemove',function(){document.body.classList.add('move');clearTimeout(mt);mt=setTimeout(function(){document.body.classList.remove('move')},2000)});
+  addEventListener('beforeprint',function(){S.forEach(function(s){[].forEach.call(s.querySelectorAll('[data-count]'),function(e){e.textContent=fmt(+e.dataset.count,+(e.dataset.dec||0))})})});
+  window.deck={go:go,next:next,prev:prev,count:N,steps:function(i){return steps(S[i])},cur:function(){return cur}};
+  go(Math.max(0,(parseInt(location.hash.slice(1),10)||1)-1),0);
+})();
+</script>
+</body>
+</html>
