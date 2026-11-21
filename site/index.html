@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="색·글꼴·모양을 고르면 나만의 HTML PPT 스킬이 나옵니다. Claude 와 Codex 에 붙여 씁니다.">
+</head>
+<body style="margin:0">
+<title>HTML PPT 스킬 공방</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* 배치: 왼쪽에서 고르고 오른쪽 견본이 따라 바뀐다. 좁은 화면에서는 견본이 위에 붙는다. */
+:root{
+  --bg:#FBFAF6; --panel:#FFFFFF; --ink:#132C3D; --sub:#586875; --line:#E4DFD3; --soft:#F3F0E8;
+  --key:#18766B; --key-soft:#E3F0EC; --on-key:#FFFFFF; --point:#D9734E; --warn:#A8501F;
+  --sans:"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:56px}
+h1,h2,h3,p,ol,ul,fieldset,legend{margin:0;padding:0}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.02em;line-height:1.25}
+ol,ul{list-style:none}
+fieldset{border:0;min-width:0}
+a{color:var(--key)}
+:focus-visible{outline:3px solid var(--key);outline-offset:2px}
+.eyebrow{font-size:13px;font-weight:700;color:var(--key);letter-spacing:.08em}
+h1{font-size:clamp(30px,5vw,48px);font-weight:900}
+h1 em{font-style:normal;color:var(--key)}
+h2{font-size:26px;font-weight:900}
+.lead{font-size:18px;color:var(--sub);max-width:38em}
+.top{display:flex;flex-direction:column;gap:16px}
+
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:how}
+.how li{counter-increment:how;border-top:3px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+.how li::before{content:counter(how,decimal-leading-zero);font-size:13px;font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+.how b{font-size:18px}
+.how span{color:var(--sub);font-size:15px}
+
+.sec{display:flex;flex-direction:column;gap:20px}
+.build{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
+.opts{display:flex;flex-direction:column;gap:28px;min-width:0}
+.grp{display:flex;flex-direction:column;gap:12px}
+.grp>legend{font-size:17px;font-weight:700;margin-bottom:10px}
+.grp>legend small{font-weight:400;color:var(--sub);font-size:14px;margin-left:8px}
+.lbl{font-size:13px;font-weight:700;color:var(--sub)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.pick{position:relative}
+.pick input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.pick span{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--panel);font-size:14.5px;font-weight:500}
+.pick i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(128,128,128,.35)}
+.pick input:checked+span{border-color:var(--key);background:var(--key-soft);color:var(--ink);font-weight:700}
+.pick input:focus-visible+span{outline:3px solid var(--key);outline-offset:2px}
+.brands{max-height:212px;overflow:auto;padding:4px;border:1.5px solid var(--line);border-radius:14px;background:var(--panel)}
+.brands .pick span{border-color:transparent;background:transparent;min-height:36px;padding:4px 10px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type=text]{width:100%;min-height:44px;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit}
+.color{display:flex;align-items:center;gap:8px}
+.color input[type=color]{width:44px;height:44px;padding:0;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);flex:none}
+.color input[type=text]{font-family:var(--mono);font-size:14px}
+.hint{font-size:13.5px;color:var(--sub)}
+.note{font-size:13.5px;color:var(--warn);font-weight:500}
+.err{font-size:13.5px;color:var(--point);font-weight:700}
+
+.pv{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:12px;min-width:0}
+.pvbox{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft)}
+#pvhost{position:absolute;inset:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{min-height:36px;padding:4px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:500 13.5px var(--sans);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.save{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.box{border:1.5px solid var(--line);border-radius:14px;background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.box h3{font-size:18px;font-weight:700}
+.line{font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--soft);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all;user-select:all;min-height:96px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:8px 20px;border-radius:10px;border:0;background:var(--key);color:var(--on-key);font:700 16px var(--sans);cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ok{font-size:14px;font-weight:700;color:var(--key)}
+
+.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.guide .box ol{counter-reset:g;display:flex;flex-direction:column;gap:8px}
+.guide .box li{counter-increment:g;display:grid;grid-template-columns:24px 1fr;font-size:15px}
+.guide .box li::before{content:counter(g);font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:2px 6px;border-radius:6px;word-break:break-all}
+.foot{font-size:13.5px;color:var(--sub);border-top:1.5px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:4px}
+
+@media (max-width:860px){
+  .build{grid-template-columns:minmax(0,1fr)}
+  .pv{order:-1;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
+  .how,.save,.guide{grid-template-columns:minmax(0,1fr)}
+  .two{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">날쌤 분필팩</p>
+    <h1>골라서 저장하면<br><em>나만의 HTML PPT 스킬</em></h1>
+    <p class="lead">색·글꼴·모양을 고르면 그 얼굴로 발표 덱을 만드는 스킬이 나옵니다. Claude 와 Codex 에 붙여서 "이 내용으로 PPT 만들어 줘" 한마디로 씁니다.</p>
+  </header>
+
+  <ol class="how" aria-label="쓰는 순서">
+    <li><b>고르기</b><span>아래에서 출발점·색·글꼴·모양을 고릅니다. 오른쪽 견본이 바로 바뀝니다.</span></li>
+    <li><b>저장하기</b><span>ZIP 받기를 누르면 스킬 파일이 내려옵니다. 설치할 것이 따로 없습니다.</span></li>
+    <li><b>붙이기</b><span>받은 스킬을 Claude 앱, Claude Code, Codex 중 쓰는 곳에 올립니다.</span></li>
+  </ol>
+
+  <section class="sec" aria-labelledby="h-build">
+    <h2 id="h-build">스타일 고르기</h2>
+    <div class="build">
+      <form class="opts" id="f" autocomplete="off">
+        <fieldset class="grp"><legend>출발점<small>고르면 색과 둥글기가 따라옵니다</small></legend>
+          <div class="row" id="o-preset"></div>
+          <span class="lbl" id="l-brand">한국 서비스 톤 <span id="n-brand"></span>가지</span>
+          <div class="row brands" id="o-brand" role="group" aria-labelledby="l-brand"></div>
+          <p class="hint" id="brand-note">대표색과 둥글기는 ko/design.md 카탈로그(getdesign.kr)의 공개 값입니다. 바탕과 글자색은 이 도구가 맞춥니다.</p>
+        </fieldset>
+
+        <fieldset class="grp"><legend>색과 바탕</legend>
+          <span class="lbl">바탕</span><div class="row" id="o-ground"></div>
+          <div class="two">
+            <div class="field"><label class="lbl" for="key-t">포인트 색</label><div class="color"><input type="color" id="key-c" aria-label="포인트 색 고르기"><input type="text" id="key-t" maxlength="7" spellcheck="false"></div></div>
+            <div class="field"><label class="lbl" for="point-t">보조 포인트 색</label><div class="color"><input type="color" id="point-c" aria-label="보조 포인트 색 고르기"><input type="text" id="point-t" maxlength="7" spellcheck="false"></div></div>
+          </div>
+          <p class="note" id="key-note" hidden></p>
+        </fieldset>
+
+        <fieldset class="grp"><legend>글꼴</legend>
+          <span class="lbl">본문</span><div class="row" id="o-font"></div>
+          <span class="lbl">제목</span><div class="row" id="o-titleFont"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>모양</legend>
+          <span class="lbl">모서리</span><div class="row" id="o-radius"></div>
+          <span class="lbl">카드</span><div class="row" id="o-card"></div>
+          <span class="lbl">배경 무늬</span><div class="row" id="o-pattern"></div>
+          <span class="lbl">제목 꾸밈</span><div class="row" id="o-titlefx"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>움직임과 말투</legend>
+          <span class="lbl">움직임</span><div class="row" id="o-motion"></div>
+          <span class="lbl">화면 글 말투</span><div class="row" id="o-tone"></div>
+          <span class="lbl">대본</span><div class="row" id="o-script"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>이름</legend>
+          <div class="two">
+            <div class="field"><label class="lbl" for="title">스킬 이름 (한글)</label><input type="text" id="title" maxlength="40"></div>
+            <div class="field"><label class="lbl" for="name">스킬 이름 (영어 소문자·숫자·하이픈)</label><input type="text" id="name" maxlength="64" spellcheck="false"></div>
+          </div>
+          <p class="err" id="name-err" hidden></p>
+          <div class="field"><label class="lbl" for="author">바닥글에 넣을 내 이름 (비워도 됩니다)</label><input type="text" id="author" maxlength="30"></div>
+        </fieldset>
+      </form>
+
+      <div class="pv">
+        <div class="pvbox"><div id="pvhost" role="img" aria-label="고른 스타일로 그린 견본 장"></div></div>
+        <div class="tabs" id="tabs" role="group" aria-label="견본 장 바꾸기"></div>
+        <p class="hint">견본 속 숫자와 문장은 모두 가상 예시입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-save">
+    <h2 id="h-save">저장하기</h2>
+    <div class="save">
+      <div class="box"><h3>스킬 ZIP 받기</h3>
+        <p class="hint">고른 스타일이 들어간 스킬 폴더를 ZIP 하나로 받습니다. 스타터 덱, 점검 스크립트, 참고 문서가 들어 있습니다.</p>
+        <div class="acts"><button type="button" class="btn" id="dl">나만의 스킬 ZIP 받기</button><a class="btn ghost" href="downloads/nalssam-html-ppt.zip" download>날쌤 기본 스킬 받기</a></div>
+        <span class="ok" id="saved" role="status" hidden></span>
+      </div>
+      <div class="box"><h3>설정 한 줄</h3>
+        <p class="hint">날쌤 기본 스킬을 이미 붙여 두었다면 이 한 줄을 대화창에 붙여 넣고 "이 설정으로 스킬 저장해 줘"라고 해도 됩니다. 나중에 다시 고칠 때도 이 줄을 씁니다.</p>
+        <div class="line" id="line" tabindex="0" aria-label="설정 한 줄"></div>
+        <div class="acts"><button type="button" class="btn ghost" id="copy">설정 한 줄 복사</button><span class="ok" id="copied" role="status" hidden></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-guide">
+    <h2 id="h-guide">내 AI 에 붙이기</h2>
+    <div class="guide">
+      <div class="box"><h3>Claude 앱</h3><ol>
+        <li><span>설정 &gt; 기능에서 <b>코드 실행 및 파일 생성</b>을 켭니다.</span></li>
+        <li><span><b>사용자 지정 &gt; 스킬</b>에서 + 를 누르고 스킬 만들기 &gt; <b>스킬 업로드</b>를 고릅니다.</span></li>
+        <li><span>받은 ZIP 을 그대로 올립니다. 풀지 않습니다.</span></li>
+        <li><span>새 대화에서 "<span class="sk-title"></span>(으)로 PPT 만들어 줘"라고 합니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Claude Code</h3><ol>
+        <li><span>ZIP 을 풉니다.</span></li>
+        <li><span>폴더를 <code>~/.claude/skills/<span class="sk-name"></span>/</code> 에 둡니다. 한 프로젝트에서만 쓰려면 <code>.claude/skills/</code> 아래에 둡니다.</span></li>
+        <li><span><code>/<span class="sk-name"></span></code> 로 부르거나 그냥 PPT 를 부탁합니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Codex</h3><ol>
+        <li><span>ZIP 을 풉니다.</span></li>
+        <li><span>폴더를 <code>~/.agents/skills/<span class="sk-name"></span>/</code> 에 둡니다. 한 저장소에서만 쓰려면 <code>.agents/skills/</code> 아래에 둡니다.</span></li>
+        <li><span><code>$<span class="sk-name"></span></code> 로 부릅니다. 안 보이면 Codex 를 다시 켭니다.</span></li>
+      </ol></div>
+    </div>
+    <p class="hint">메뉴 이름은 2026년 11월 공식 도움말 기준입니다. 앱이 바뀌어 다르게 보이면 "스킬 업로드"를 찾으면 됩니다.</p>
+  </section>
+
+  <footer class="foot">
+    <span>한국 서비스 대표색: <a href="https://www.getdesign.kr/">ko/design.md (getdesign.kr)</a> · CC BY 4.0. 각 이름과 상표는 해당 기업의 것이며, 만들어지는 덱에는 브랜드 이름이 들어가지 않습니다.</span>
+    <span>구성 기준 <a href="https://designinwords.onpod.ai/">Design in words</a> · 이징 값 <a href="https://github.com/lifeprompt-team/remotion-scenes">Remotion Scenes</a> (MIT) · 글꼴 Pretendard·Google Fonts (SIL OFL)</span>
+    <span>만든 곳: <a href="https://github.com/nalssam/eduAI">nalssam/eduAI</a></span>
+  </footer>
+</div>
+
+<script>/* 나만의 HTML PPT 스킬 만들기 — 공통 코드.
+   브라우저(고르기 판)와 Node(scripts/make_skill.js)가 같은 파일을 쓴다. 의존성 없음. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.PPTCore = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var PRETENDARD = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
+  var FALLBACK = '-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+  var gf = function (q) { return 'https://fonts.googleapis.com/css2?family=' + q + '&display=swap'; };
+
+  var FONTS = {
+    pretendard: { ko: '프리텐다드', stack: '"Pretendard Variable",Pretendard,' + FALLBACK, href: PRETENDARD },
+    noto: { ko: '본고딕(Noto Sans KR)', stack: '"Noto Sans KR",' + FALLBACK, href: gf('Noto+Sans+KR:wght@300;400;500;700;800;900') },
+    plex: { ko: 'IBM 플렉스 산스', stack: '"IBM Plex Sans KR",' + FALLBACK, href: gf('IBM+Plex+Sans+KR:wght@300;400;500;600;700') },
+    gothica1: { ko: '고딕 A1', stack: '"Gothic A1",' + FALLBACK, href: gf('Gothic+A1:wght@300;400;500;700;800;900') }
+  };
+  var TITLE_FONTS = {
+    same: { ko: '본문과 같게' },
+    blackhan: { ko: '검은고딕', stack: '"Black Han Sans",', href: gf('Black+Han+Sans'), weight: 400 },
+    dohyeon: { ko: '도현', stack: '"Do Hyeon",', href: gf('Do+Hyeon'), weight: 400 },
+    jua: { ko: '주아', stack: '"Jua",', href: gf('Jua'), weight: 400 },
+    myeongjo: { ko: '나눔명조', stack: '"Nanum Myeongjo",', href: gf('Nanum+Myeongjo:wght@700;800'), weight: 800 }
+  };
+  var GROUNDS = {
+    warm: { ko: '웜 오프화이트', dark: false, bg: '#FBFAF6', ink: '#132C3D', sub: '#586875', line: '#E4DFD3', card: '#FFFFFF', paper: '#F3F0E8', zebra: '#F5F2EA', mute: '#C9CED2' },
+    white: { ko: '흰색', dark: false, bg: '#FFFFFF', ink: '#17202A', sub: '#5A6672', line: '#E3E7EB', card: '#FFFFFF', paper: '#F3F5F7', zebra: '#F7F8FA', mute: '#CBD2D9' },
+    chalk: { ko: '칠판', dark: true, bg: '#1F3A33', ink: '#F5F2E8', sub: '#B9C9C2', line: 'rgba(245,242,232,.2)', card: 'rgba(255,255,255,.06)', paper: 'rgba(255,255,255,.09)', zebra: 'rgba(255,255,255,.05)', mute: '#5E776F' },
+    navy: { ko: '네이비', dark: true, bg: '#132C3D', ink: '#FBFAF6', sub: '#AEBBC4', line: 'rgba(251,250,246,.18)', card: 'rgba(255,255,255,.06)', paper: 'rgba(255,255,255,.09)', zebra: 'rgba(255,255,255,.05)', mute: '#4A6272' }
+  };
+  var CHOICES = {
+    ground: Object.keys(GROUNDS), font: Object.keys(FONTS), titleFont: Object.keys(TITLE_FONTS),
+    radius: ['0', '8', '12', '20'], card: ['line', 'shadow', 'fill'], pattern: ['none', 'grid', 'dots'],
+    titlefx: ['none', 'bar', 'marker'], motion: ['basic', 'calm', 'off'], tone: ['haeyo', 'hamnida'], script: ['read', 'live']
+  };
+  var DEFAULTS = {
+    name: 'my-html-ppt', title: '나만의 HTML PPT', author: '', preset: 'nalssam', brand: '',
+    ground: 'warm', key: '#18766B', point: '#D9734E', font: 'pretendard', titleFont: 'same',
+    radius: '12', card: 'line', pattern: 'none', titlefx: 'none', motion: 'basic', tone: 'haeyo', script: 'live'
+  };
+
+  /* ── 색 ── */
+  function rgb(hex) { hex = hex.replace('#', ''); if (hex.length === 3) hex = hex.replace(/./g, '$&$&'); return [0, 2, 4].map(function (i) { return parseInt(hex.substr(i, 2), 16); }); }
+  function hex(c) { return '#' + c.map(function (v) { return ('0' + Math.round(Math.max(0, Math.min(255, v))).toString(16)).slice(-2); }).join('').toUpperCase(); }
+  function lum(h) { var c = rgb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function mix(a, b, t) { var x = rgb(a), y = rgb(b); return hex(x.map(function (v, i) { return v + (y[i] - v) * t; })); }
+  /* 바탕 위에서 읽히도록 목표 대비가 될 때까지 검정(밝은 바탕)이나 흰색(어두운 바탕) 쪽으로 옮긴다 */
+  function readable(color, bg, target) {
+    var toward = lum(bg) > 0.4 ? '#000000' : '#FFFFFF', out = color, t = 0;
+    while (contrast(out, bg) < target && t < 1) { t += 0.04; out = mix(color, toward, t); }
+    return out;
+  }
+  function isHex(v) { return /^#[0-9A-Fa-f]{6}$/.test(v); }
+
+  /* ── 설정 ── */
+  function slug(v) { return String(v || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 64); }
+  function nameError(n) {
+    if (!n) return '이름을 영어 소문자·숫자·하이픈으로 적어 주세요';
+    if (n !== slug(n)) return '영어 소문자·숫자·하이픈만 쓸 수 있어요';
+    if (/claude|anthropic/.test(n)) return '이름에 claude 나 anthropic 은 넣을 수 없어요';
+    return '';
+  }
+  function normalize(input) {
+    var c = {}, k;
+    for (k in DEFAULTS) c[k] = input && input[k] != null && input[k] !== '' ? String(input[k]) : DEFAULTS[k];
+    for (k in CHOICES) if (CHOICES[k].indexOf(c[k]) < 0) c[k] = DEFAULTS[k];
+    if (!isHex(c.key)) c.key = DEFAULTS.key;
+    if (!isHex(c.point)) c.point = DEFAULTS.point;
+    c.key = c.key.toUpperCase(); c.point = c.point.toUpperCase();
+    c.name = slug(c.name) || DEFAULTS.name;
+    if (nameError(c.name)) c.name = DEFAULTS.name;
+    c.title = c.title.replace(/[<>"\n\r]/g, '').slice(0, 40) || DEFAULTS.title;
+    c.author = c.author.replace(/[<>"\n\r]/g, '').slice(0, 30);
+    c.brand = slug(c.brand);
+    return c;
+  }
+  var ORDER = ['name', 'title', 'author', 'preset', 'brand', 'ground', 'key', 'point', 'font', 'titleFont', 'radius', 'card', 'pattern', 'titlefx', 'motion', 'tone', 'script'];
+  function toLine(cfg) {
+    var c = normalize(cfg);
+    return '[HTML PPT 스킬 설정] ' + ORDER.filter(function (k) { return c[k] !== ''; }).map(function (k) { return k + '=' + c[k]; }).join('; ');
+  }
+  function parseLine(line) {
+    var o = {}, s = String(line).trim();
+    if (s.charAt(0) === '{') return normalize(JSON.parse(s));
+    s.replace(/^\[[^\]]*\]\s*/, '').split(';').forEach(function (p) { var i = p.indexOf('='); if (i > 0) o[p.slice(0, i).trim()] = p.slice(i + 1).trim(); });
+    return normalize(o);
+  }
+
+  /* ── 테마 ── */
+  function tokens(cfg) {
+    var c = normalize(cfg), g = GROUNDS[c.ground];
+    var key = readable(c.key, g.bg, 4.5), point = readable(c.point, g.bg, 3);
+    var a = rgb(key);
+    return {
+      bg: g.bg, ink: g.ink, sub: g.sub, key: key, point: point, line: g.line, card: g.card, paper: g.paper, zebra: g.zebra, mute: g.mute,
+      keySoft: g.dark ? 'rgba(' + a.join(',') + ',.14)' : mix(key, g.bg, 0.88),
+      onKey: contrast('#FFFFFF', key) >= 4.5 ? '#FFFFFF' : '#10202A',
+      keyMoved: key !== c.key, pointMoved: point !== c.point
+    };
+  }
+  function fontInfo(cfg) {
+    var c = normalize(cfg), f = FONTS[c.font], t = TITLE_FONTS[c.titleFont], links = [f.href];
+    if (t.href) links.push(t.href);
+    return { sans: f.stack, title: t.stack ? t.stack + f.stack : '', weight: t.weight || 800, links: links };
+  }
+  function themeCss(cfg) {
+    var c = normalize(cfg), t = tokens(c), f = fontInfo(c);
+    return ':root,[data-theme="nalssam"]{--bg:' + t.bg + ';--ink:' + t.ink + ';--sub:' + t.sub + ';--key:' + t.key + ';--key-soft:' + t.keySoft +
+      ';--point:' + t.point + ';--line:' + t.line + ';--card:' + t.card + ';--paper:' + t.paper + ';--zebra:' + t.zebra + ';--on-key:' + t.onKey + ';--mute:' + t.mute + '}\n' +
+      ':root{--r:' + c.radius + 'px;--sans:' + f.sans + (f.title ? ';--title-font:' + f.title + ';--title-weight:' + f.weight : '') + '}';
+  }
+  function stageAttrs(cfg) { var c = normalize(cfg); return { card: c.card, pattern: c.pattern, titlefx: c.titlefx, motion: c.motion }; }
+
+  /* ── 스킬 파일 만들기 ── */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function applyStarter(html, cfg) {
+    var c = normalize(cfg), f = fontInfo(c), a = stageAttrs(c);
+    html = html.replace(/<!--FONT-->[\s\S]*?<!--\/FONT-->/, '<!--FONT-->\n' + f.links.map(function (h) { return '<link rel="stylesheet" href="' + h + '">'; }).join('\n') + '\n<!--/FONT-->');
+    html = html.replace(/(<style id="my-theme">)[\s\S]*?(<\/style>)/, function (m, x, y) { return x + '\n' + themeCss(c) + '\n' + y; });
+    Object.keys(a).forEach(function (k) { html = html.replace(new RegExp('(<div id="stage"[^>]*data-' + k + '=")[^"]*'), '$1' + a[k]); });
+    html = html.replace(/<title>[^<]*<\/title>/, '<title>' + esc(c.title) + ' 스타터</title>');
+    html = html.replace(/(<div id="stage"[^>]*data-event=")[^"]*/, '$1' + esc(c.title) + ' 견본');
+    html = html.replace(/(<div id="stage"[^>]*data-author=")[^"]*/, '$1' + esc(c.author));
+    html = html.replace(/<p class="who" data-step="1">nalssam 박준호<\/p>/, '<p class="who" data-step="1">' + esc(c.author || '발표자 이름') + '</p>');
+    return html;
+  }
+  function fill(tpl, vars) {
+    tpl = tpl.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}\n?/g, function (m, k, body) { return vars[k] ? body : ''; });
+    return tpl.replace(/\{\{(\w+)\}\}/g, function (m, k) { return vars[k] != null ? vars[k] : ''; });
+  }
+  function skillVars(cfg, brandInfo) {
+    var c = normalize(cfg), t = tokens(c), g = GROUNDS[c.ground];
+    return {
+      name: c.name, title: c.title, author: c.author, hasAuthor: !!c.author,
+      footer: (c.author ? '행사명 | ' + c.author + ' | 날짜' : '행사명 | 날짜'),
+      ground: g.ko, bg: t.bg, ink: t.ink, sub: t.sub, key: t.key, keySoft: t.keySoft, point: t.point, line: t.line, card: t.card, paper: t.paper, zebra: t.zebra,
+      fontKo: FONTS[c.font].ko + (c.titleFont !== 'same' ? ' (제목은 ' + TITLE_FONTS[c.titleFont].ko + ')' : ''),
+      pretendard: c.font === 'pretendard' && c.titleFont === 'same',
+      radius: c.radius,
+      cardKo: { line: '얇은 테두리의 납작한 상자(그림자 없음)', shadow: '테두리 없이 옅은 그림자로 띄운 상자', fill: '테두리 없이 옅은 면으로 채운 상자' }[c.card],
+      toneScreen: c.tone === 'haeyo' ? '짧은 `~해요`' : '짧은 `~합니다`',
+      scriptKo: c.script === 'read' ? '녹화 낭독형(분당 300~350자, 그대로 읽는 글)' : '라이브 요점형(분당 약 100자 + `[시연]`·`[참여]` 큐)',
+      motionKo: { basic: '기본(아래에서 올라오며 등장)', calm: '차분하게(제자리에서 서서히)', off: '끔(등장·전환 없이 바로)' }[c.motion],
+      brand: !!c.brand, brandName: brandInfo ? brandInfo.name : c.brand, brandSlug: c.brand, brandUrl: brandInfo ? brandInfo.url : 'https://www.getdesign.kr/services/' + c.brand,
+      configLine: toLine(c)
+    };
+  }
+  /* files: { 'SKILL.template.md', 'assets/starter.html', 'scripts/check.js', … } → 새 스킬의 { 경로: 내용 } */
+  function buildSkill(cfg, files, brandInfo) {
+    var c = normalize(cfg), out = {};
+    out['SKILL.md'] = fill(files['assets/SKILL.template.md'], skillVars(c, brandInfo));
+    out['assets/starter.html'] = applyStarter(files['assets/starter.html'], c);
+    ['scripts/check.js', 'scripts/inline_font.py', 'references/design-rules.md', 'references/motion.md', 'references/brand-themes.md'].forEach(function (p) { if (files[p]) out[p] = files[p]; });
+    out['config.json'] = JSON.stringify(c, null, 2) + '\n';
+    return out;
+  }
+
+  /* ── ZIP (압축 없이 묶기) ── */
+  var CRC = (function () { var t = [], n, k, c; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(b) { var c = 0xFFFFFFFF, i; for (i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function utf8(s) { return new TextEncoder().encode(s); }
+  function zip(files, rootDir) {
+    var parts = [], central = [], offset = 0, count = 0;
+    function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+    function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+    Object.keys(files).sort().forEach(function (path) {
+      var name = utf8((rootDir ? rootDir + '/' : '') + path), data = typeof files[path] === 'string' ? utf8(files[path]) : files[path], crc = crc32(data);
+      var common = [].concat(u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+      var local = new Uint8Array([0x50, 0x4B, 3, 4].concat(common));
+      central.push(new Uint8Array([0x50, 0x4B, 1, 2].concat(u16(20), common, u16(0), u16(0), u16(0), u32(0), u32(offset))), name);
+      parts.push(local, name, data); offset += local.length + name.length + data.length; count++;
+    });
+    var csize = central.reduce(function (n, p) { return n + p.length; }, 0);
+    var end = new Uint8Array([0x50, 0x4B, 5, 6].concat(u16(0), u16(0), u16(count), u16(count), u32(csize), u32(offset), u16(0)));
+    var all = parts.concat(central, [end]), total = all.reduce(function (n, p) { return n + p.length; }, 0), out = new Uint8Array(total), pos = 0;
+    all.forEach(function (p) { out.set(p, pos); pos += p.length; });
+    return out;
+  }
+
+  return { FONTS: FONTS, TITLE_FONTS: TITLE_FONTS, GROUNDS: GROUNDS, CHOICES: CHOICES, DEFAULTS: DEFAULTS,
+    normalize: normalize, nameError: nameError, slug: slug, toLine: toLine, parseLine: parseLine,
+    tokens: tokens, themeCss: themeCss, stageAttrs: stageAttrs, fontInfo: fontInfo, contrast: contrast,
+    applyStarter: applyStarter, buildSkill: buildSkill, zip: zip };
+});
+</script>
+<script>
+(function(){
+  var C=PPTCore, DATA={"files":{"assets/SKILL.template.md":"---\nname: {{name}}\ndescription: \"{{title}} — 내 스타일로 맞춘 HTML 발표 덱을 파일 하나로 만든다. 결론 문장 제목, 장마다 대본, 넘기기·단계 등장·PDF 저장. 트리거: {{title}}, {{name}}, HTML PPT, HTML 덱, 웹 슬라이드.\"\n---\n\n# {{name}} · {{title}}\n\n내 스타일로 맞춘 발표 덱을 **브라우저로 여는 HTML 파일 하나**로 만든다. 색·글꼴·모서리·움직임은 이미 정해져 있다(`config.json`).\n\n새로 만드는 것은 **내용**뿐이다. 엔진(CSS·JS)과 장표 틀은 `assets/starter.html` 을 복사해서 그대로 쓴다. 기억으로 다시 짜지 않는다.\n\n## 1. 시작 전 확인\n\n요청에 이미 있는 것은 다시 묻지 않는다. 모자란 것만 한 번에 묻는다.\n\n1. **내용**: 넣을 글이나 자료(지도안·안내문·PDF·메모). 주제 한 줄만 받았으면 만들지 말고 내용을 먼저 받는다. \"알아서 써 줘\"라고 한 때에만 초안을 쓰고, 초안이라고 한 줄로 알린다.\n2. **행사**: 이름·날짜·대상·총 시간·본문 장수. 표지와 감사 장은 장수에 넣지 않고 따로 더한다.\n3. **대본**: 기본은 {{scriptKo}}. 다르게 원하면 따른다.\n4. **발표자**: 바닥글에 넣을 이름{{#hasAuthor}}(기본 `{{author}}`){{/hasAuthor}}.\n\n## 2. 스타일 한눈에\n\n- **분위기**: {{ground}} 바탕, 포인트 색 `{{key}}` 하나, 보조 포인트 `{{point}}` 는 아주 조금. 여백이 넉넉하다. 카드는 {{cardKo}}, 모서리 {{radius}}px.\n- **글꼴**: {{fontKo}}.\n- **움직임**: {{motionKo}}.\n- **문장**: 제목 = 결론 한 문장(30자 안팎, 두 줄까지). 키커 = `01 섹션명`. 한 장 한 메시지, 근거 2~5개. 아래 **강조 띠**로 한 줄 결론. 같은 유형을 3장 연속으로 쓰지 않는다.\n- **바닥글**: `{{footer}}` + 오른쪽 `NN / 총장수`. 자동으로 붙는다(표지·전면·감사 장 제외).\n- **말투**: 화면 글은 {{toneScreen}}, 대본은 구어체 존댓말.\n- **지어내지 않는다**: 숫자·연도·인용은 확인한 것만. 예시는 `(가상)` 이라고 적는다. 학생 실명·얼굴·개인정보는 넣지 않는다.\n\n색 토큰은 `starter.html` 의 `\u003cstyle id=\"my-theme\">` 에, 간격·이징은 맨 위 `:root` 에 있다.\n\n| 이름 | 값 | 쓰임 |\n|---|---|---|\n| `--bg` / `--ink` / `--sub` | `{{bg}}` / `{{ink}}` / `{{sub}}` | 바탕 / 제목·본문 / 부제·설명·바닥글 |\n| `--key` / `--key-soft` | `{{key}}` / `{{keySoft}}` | 키커·번호·강조 막대 / 띠·칩 바탕 |\n| `--point` | `{{point}}` | 마지막 칸·원칙 한 줄. 화면에 아주 조금만 |\n| `--line` / `--card` / `--paper` / `--zebra` | `{{line}}` / `{{card}}` / `{{paper}}` / `{{zebra}}` | 카드 테두리 / 카드 / 그림 자리 / 표 줄무늬 |\n{{#brand}}\n**브랜드 톤**: 포인트 색과 둥글기는 ko/design.md 카탈로그의 「{{brandName}}」 항목({{brandUrl}})에서 가져왔다. 바탕·글자색은 이 스킬이 맞춘 값이다. 이 스킬로 처음 덱을 만들 때 `references/brand-themes.md` 대로 `{{brandSlug}}` 의 DESIGN.md 를 받아 Do/Don't 와 Known Gaps 를 확인하고 따른다. 덱의 제목·바닥글·클래스 이름에는 그 브랜드 이름을 넣지 않는다.\n{{/brand}}\n\n## 3. 작업 순서\n\n1. **확인**(§1).\n2. **장 목록**: 번호 · 제목(결론 문장) · 장표 유형(§4) · 장별 분. 기본 골격은 `표지 → 오늘의 질문 → (간지 → 본문: 개념 → 사례 → 시연 → 실습)× → 요약 → 내일 시작할 한 가지 → 출처 → 감사 + QR`. 길면 목록을 먼저 보여 주고 확인받는다.\n3. **그림 목록**: 그림이 들어갈 장마다 `번호_이름`(예: `07_교실`)으로 필요한 그림을 알려 준다. 받기 전에는 그림 자리(`.ph`)를 둔다. 수업 사진·작품·화면 캡처는 만들지 않고 받는다.\n4. **조립**: `starter.html` 을 작업 폴더에 복사 → `#stage` 의 `data-event`·`data-author`·`data-date` 를 바꾼다 → 견본 장(`\u003csection class=\"slide\">`)을 복사해 글자를 바꾼다. 안 쓰는 견본 장은 지운다. 장마다 `data-title`(겹치면 안 됨)과 `\u003caside class=\"notes\">` 대본을 쓴다.\n5. **점검**(§7): `node scripts/check.js 덱.html shots` → 캡처를 **전부** 눈으로 본다.\n{{#pretendard}}6. **글꼴 넣기**(인터넷 없는 곳에서 쓸 때): `python3 scripts/inline_font.py 덱.html 완성.html`.\n{{/pretendard}}\n7. **전달**: 파일과 함께 장수 · 총 시간 · `(가상)` 표시한 예시 · 확인하지 못한 사실을 한두 문장으로 알린다.\n\n## 4. 장표 유형 (스타터의 견본 장)\n\n| # | data-title | 클래스 | 쓰임 |\n|---|---|---|---|\n| 1 | 표지 | `.cover` | 큰 제목 두 줄 + 한 줄 문구 + 소속, 오른쪽 그림 |\n| 2 | 오늘의 질문 | `.g3.cards3` | 3열 카드. 소개·질문·사례 |\n| 3 | 간지 · 구성 | `.divider` | 화면 밖으로 나가는 큰 번호 + 파트 제목. `data-theme=\"navy\"` |\n| 4 | 한 장 한 메시지 | `.msg` | 결론 제목 + 큰 숫자 하나 + 그림 하나 + 강조 띠 |\n| 5 | 정렬한 막대 차트 | `.bars` | 큰 순서로 정렬, 말할 막대(`.hl`) 하나만 키컬러 |\n| 6 | 큰 숫자 셋 | `.g3.stats` | 숫자 셋 + 한 줄 설명. 숫자는 올라가며 나타난다 |\n| 7 | 사진과 글 | `.split` | 1:2 분할(`.rev` 는 2:1) |\n| 8 | 번호 목록 | `.nlist` | 큰 번호 + 굵은 한 줄 + 작은 설명. 첫 줄 `.hl` |\n| 9 | 타임라인 | `.tl` | 4칸, 마지막 칸만 포인트 색 |\n| 10 | 비교표 | `.tbl` | 핵심 열(`.k`)만 진하게 |\n| 11 | 단계 카드 | `.g4.steps` | 번호 원 + 제목 + 설명, 최대 4칸 |\n| 12 | 인용 | `.quote` | 왼쪽 그림 + 큰 인용(3줄 수동 줄바꿈) + 칩 3개 |\n| 13 | 전후 대비 | `.vs` | 좌우 색이 갈리는 전·후 |\n| 14 | 콜아웃 | `.callout` | 캡처 한 곳만 테두리로 짚고 나머지는 어둡게 |\n| 15 | 전면 이미지 | `.full` | 끝까지 찬 그림 + 아래 스크림 + 흰 제목 |\n| 16 | 칠판 테마 | `data-theme=\"chalk\"` | 한 장만 어두운 판으로 바꾸기(`navy` 도 있다) |\n| 17 | 참고문헌 | `.refs` | 출처 모음 |\n| 18 | 감사 | `.thanks` | 감사 인사 + QR 카드 |\n\n한 장의 뼈대:\n\n```html\n\u003csection class=\"slide\" data-title=\"겹치지 않는 장 이름\">\n  \u003cdiv class=\"kicker\">01 섹션명\u003c/div>\n  \u003ch2 class=\"title\">결론 한 문장\u003c/h2>\n  \u003cp class=\"lead\">부제 한 줄(선택)\u003c/p>\n  \u003cdiv class=\"body\"> …부품… \u003cdiv class=\"band\" data-step=\"1\">한 줄 \u003cb>결론\u003c/b>\u003c/div>\u003c/div>\n  \u003caside class=\"notes\">4장 · 2분\n구어체 대본…\u003c/aside>\n\u003c/section>\n```\n\n- 강조: `\u003cem>` = 키컬러, `.pt` = 포인트 색, `\u003cb>` = 굵게. 한 장에 두세 곳만.\n- 그림: `\u003cimg class=\"shot zoom\" src=\"data:image/jpeg;base64,…\">` (`.zoom` 은 누르면 크게). 긴 변 1400px, JPEG 품질 80 안팎으로 줄여 파일 안에 넣는다.\n- 새 배치가 꼭 필요하면 그 장에만 인라인 `style` 로 조금 고친다. 간격은 `--s1`~`--s6`(8의 배수)만 쓴다.\n\n## 5. 움직임\n\n엔진에 이미 들어 있다. 쓰는 법만 지킨다. 자세한 근거는 `references/motion.md`.\n\n- **단계 등장**: `data-step=\"1\"`, `\"2\"`… → 를 누를 때마다 차례로 나온다. 같은 번호는 같이. 한 장에 4단계 안팎. `data-fx=\"fade\"`(제자리에서), `\"pop\"`(톡).\n- **차례 등장**: 묶음에 `.stag` 를 붙이면 자식이 60ms 간격으로 나온다. 순서가 있는 것에만.\n- **숫자 올라가기**: `\u003cspan data-count=\"12400\">0\u003c/span>`, 소수는 `data-dec=\"1\"`.\n- **글자 등장**: `.kin` — 표지·간지·감사 제목 한 줄에만. 1초 안에 끝난다.\n- **선 자라기**: `.grow`.\n- **장 전환**: 기본은 페이드 0.3초 하나. 간지처럼 크게 바뀌는 장에만 `data-tr=\"wipe|circle|slice\"`.\n- 화면에 `움직임 줄이기`가 켜져 있으면 모두 꺼진다. 5초 넘게 도는 반복 움직임은 넣지 않는다.\n\n## 6. 대본 규칙\n\n- 장마다 `\u003caside class=\"notes\">` 에 쓴다. 발표 중 `N` 키로 아래에 뜬다.\n- 첫 줄은 `7장 · 3분 · 10:17~10:20`(시각을 모르면 `7장 · 3분`), 다음 줄부터 구어체 본문.\n- 길이는 §1 의 대본 유형을 따르고, 장별 분을 더해 행사 시간과 맞는지 검산한다.\n- 한 장의 대본은 그 장의 제목(결론)을 말로 한 번 더 닫는다. 첫 장에 인사, 마지막 장에 마무리 인사와 QR 안내.\n\n## 7. 점검과 전달\n\n```bash\nnode scripts/check.js 덱.html shots            # 1600×900, 장마다 마지막 단계까지 펼쳐 캡처\nnode scripts/check.js 덱.html shots-m --mobile # 휴대폰 세로 화면\n```\n\n- `문제 없음`이 나와야 한다. `주의`(화면 밖·바닥글과 겹침·잘림·제목 3줄·이름표 제목·대본 없음·`data-title` 겹침)는 하나씩 고친다. 넘치면 글자를 줄이지 말고 문장을 줄이거나 장을 나눈다.\n- 캡처를 모아 전부 본다. 볼 것: 제목이 결론 문장인가, 강조가 한 장에 셋을 넘지 않는가, 포인트 색이 넓게 쓰이지 않았는가, 같은 유형이 3장 연속인가, 아래가 텅 비지 않았는가, 그림 자리가 남아 있지 않은가.\n- 움직임과 전환은 정지 화면에 안 보이니 사용자에게 직접 열어 확인해 달라고 한 줄 덧붙인다.\n- **PDF**: 브라우저에서 `P` → 대상 \"PDF로 저장\", 여백 없음, 배경 그래픽 켜기. 한 장이 한 쪽으로, 모든 단계가 보인 상태로 나온다.\n- **키**: `→`·`Space` 다음 / `←` 이전 / `PgDn`·`PgUp` 장 단위 / 숫자+`Enter` 이동 / `G` 목록 / `N` 대본 / `F` 전체 화면 / `P` 인쇄 / `?` 도움말. 휴대폰은 좌우로 민다.\n\n## 8. 테마\n\n- 색은 `\u003cstyle id=\"my-theme\">` 한 곳에서만 바꾼다. 장 안에 색을 직접 적지 않는다.\n- `\u003csection>` 에 `data-theme=\"navy\"` 나 `\"chalk\"` 를 붙이면 그 장만 어두운 판이 된다. 간지·질문 장에 쓴다.\n- 카드 모양·배경 무늬·제목 꾸밈·움직임은 `#stage` 의 `data-card` · `data-pattern` · `data-titlefx` · `data-motion` 값이다. 이 스킬의 기본값을 덱마다 바꾸지 않는다.\n- 설정을 다시 고르고 싶으면 `config.json` 의 한 줄을 고르기 판에 붙여 넣어 고친 뒤 새로 저장한다.\n\n## 9. 함정\n\n1. `\u003csection>` 안의 태그 짝이 안 맞으면 뒤 장이 통째로 사라진다 → `check.js` 의 장수가 목록과 같은지 본다.\n2. 그림 자리(`.ph`)를 그대로 둔 채 전달하지 않는다. 남겼으면 어느 장인지 알린다.\n3. 글꼴은 인터넷에서 받아 온다. 인터넷이 없는 곳에서는 기기의 기본 글꼴로 바뀐다.{{#pretendard}} `inline_font.py` 를 돌린 파일을 주면 글꼴이 파일 안에 들어간다. 글자를 고친 뒤에는 다시 돌린다.{{/pretendard}}\n4. 차트 막대는 `--v`(가장 큰 값을 100 으로 본 비율)로 길이를 정한다. 값 자체는 막대 끝 숫자로 적는다.\n5. 이 엔진에는 실시간 투표·채팅·타이머·음악이 없다. 그런 참여 기능이 필요한 연수는 그 기능이 들어 있는 다른 덱 엔진을 쓴다.\n\n## 10. 참고 파일\n\n- `assets/starter.html` — 엔진 + 견본 18장. 원본은 고치지 않고 복사해서 쓴다.\n- `scripts/check.js` — 캡처와 넘침·대본·제목 검사(Playwright).\n{{#pretendard}}- `scripts/inline_font.py` — 쓰인 글자만 담은 Pretendard 를 파일 안에 넣는다.\n{{/pretendard}}- `config.json` — 이 스킬을 만든 설정.\n- `references/design-rules.md` — 장을 짤 때 지키는 수치 기준과 피할 것.\n- `references/motion.md` — 이징·전환·시차 값과 그 근거.\n- `references/brand-themes.md` — 다른 브랜드 톤을 입히는 법.\n","assets/starter.html":"\u003c!doctype html>\n\u003chtml lang=\"ko\">\n\u003chead>\n\u003cmeta charset=\"utf-8\">\n\u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\u003ctitle>날쌤 HTML PPT 스타터\u003c/title>\n\u003c!--FONT-->\n\u003clink rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\">\n\u003c!--/FONT-->\n\u003cstyle>\n/* ═════════ 1. 토큰 — 색·글꼴·간격은 여기서만 바꾼다 ═════════ */\n:root,[data-theme=\"nalssam\"]{\n  --bg:#FBFAF6; --ink:#132C3D; --sub:#586875; --key:#18766B; --key-soft:#E3F0EC;\n  --point:#D9734E; --line:#E4DFD3; --card:#FFFFFF; --paper:#F3F0E8; --zebra:#F5F2EA;\n  --on-key:#FFFFFF; --mute:#C9CED2;\n}\n[data-theme=\"chalk\"]{           /* 칠판: 분필 느낌의 어두운 판 */\n  --bg:#1F3A33; --ink:#F5F2E8; --sub:#B9C9C2; --key:#9FE0CB; --key-soft:rgba(159,224,203,.14);\n  --point:#F6C177; --line:rgba(245,242,232,.2); --card:rgba(255,255,255,.06); --paper:rgba(255,255,255,.09); --zebra:rgba(255,255,255,.05);\n  --on-key:#12302A; --mute:#5E776F;\n}\n[data-theme=\"navy\"]{            /* 간지·강조 장용 */\n  --bg:#132C3D; --ink:#FBFAF6; --sub:#AEBBC4; --key:#7FD1C1; --key-soft:rgba(127,209,193,.14);\n  --point:#F0957A; --line:rgba(251,250,246,.18); --card:rgba(255,255,255,.06); --paper:rgba(255,255,255,.09); --zebra:rgba(255,255,255,.05);\n  --on-key:#132C3D; --mute:#4A6272;\n}\n:root{\n  --sans:\"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;\n  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:48px; --s6:64px;   /* 간격은 8의 배수만 */\n  --m:72px;                                                         /* 좌우 여백 */\n  --r:12px; --r-pill:999px;\n  --out:cubic-bezier(.16,1,.3,1); --smooth:cubic-bezier(.4,0,.2,1); --over:cubic-bezier(.34,1.56,.64,1);\n  --dur:.3s;                                                        /* 전환은 0.5초를 넘기지 않는다 */\n}\n\n/* ═════════ 2. 무대 ═════════ */\n*,*::before,*::after{box-sizing:border-box}\nhtml,body{height:100%;margin:0;background:#0d1a22;overflow:hidden}\nbody{font-family:var(--sans);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}\n#stage{position:fixed;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}\n.slide{position:absolute;inset:0;padding:40px var(--m) 64px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;visibility:hidden;opacity:0}\n.slide.on{visibility:visible;opacity:1;z-index:2}\n.slide.out{visibility:visible;opacity:1;z-index:1}\nh1,h2,h3,p,ul,ol,figure,blockquote{margin:0}\nul,ol{padding:0;list-style:none}\np,li,h1,h2,h3{text-wrap:pretty}\nimg{display:block;max-width:100%}\nb,strong{font-weight:700}\nem{font-style:normal;color:var(--key);font-weight:700}\n.pt{color:var(--point)}\n.notes{display:none}\n\n/* 머리말: 키커 → 결론 제목 → 부제 */\n.kicker{font-size:20px;font-weight:700;color:var(--key);letter-spacing:.02em;margin-bottom:var(--s2)}\n.title{font-size:52px;font-weight:800;line-height:1.22;letter-spacing:-.02em;max-width:1400px}\n.lead{font-size:24px;line-height:1.5;color:var(--sub);margin-top:var(--s2)}\n.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:var(--s4);padding-top:var(--s4)}\n.body.top{justify-content:flex-start}\n\n/* 바닥글(자동) */\n.foot{position:absolute;left:var(--m);right:var(--m);bottom:24px;display:flex;justify-content:space-between;font-size:15px;color:var(--sub);font-variant-numeric:tabular-nums}\n.foot b{font-weight:500}\n#bar{position:absolute;left:0;bottom:0;height:4px;background:var(--key);z-index:5;transition:width var(--dur) var(--out)}\n\n/* ═════════ 3. 부품 ═════════ */\n.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:var(--s4)}   /* 납작한 둥근 상자, 그림자 없음 */\n.chip{display:inline-flex;align-items:center;height:36px;padding:0 var(--s2);border-radius:var(--r-pill);background:var(--key-soft);color:var(--key);font-size:18px;font-weight:700}\n.chip.pt{background:transparent;border:1.5px solid var(--point);color:var(--point)}\n.band{background:var(--key-soft);border-radius:var(--r);padding:20px var(--s4);font-size:26px;font-weight:600;line-height:1.4}   /* 민트 띠: 한 줄 결론 */\n.band b{color:var(--key)}\n.src{font-size:15px;color:var(--sub)}\n.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s1);border:2px dashed var(--line);border-radius:var(--r);background:var(--paper);color:var(--sub);font-size:18px;text-align:center}\n.ph b{font-size:22px;color:var(--ink)}\n.shot{border-radius:var(--r);border:1.5px solid var(--line);width:100%;height:100%;object-fit:cover}\n.zoom{cursor:zoom-in}\n.g2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}\n.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}\n.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}\n\n/* 표지 */\n.cover{padding:var(--s6) var(--m)}\n.cover .cv{flex:1;display:grid;grid-template-columns:1fr 520px;gap:var(--s6);align-items:center}\n.cover h1{font-size:96px;font-weight:800;line-height:1.12;letter-spacing:-.03em}\n.cover .say{font-size:36px;font-weight:700;line-height:1.4;margin-top:var(--s4)}\n.cover .who{font-size:28px;font-weight:700;color:var(--key);margin-top:var(--s5)}\n.cover .hero{height:520px}\n.cover .rule{position:absolute;left:var(--m);top:var(--s6);height:6px;width:200px;background:var(--ink);transform-origin:left}\n\n/* 간지: 화면 밖으로 나가는 큰 번호 + 작은 라벨 */\n.divider{justify-content:center}\n.divider .num{position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-size:620px;font-weight:900;line-height:.8;color:var(--paper);letter-spacing:-.04em}\n.divider .lbl{font-size:20px;font-weight:700;color:var(--key);letter-spacing:.2em;margin-bottom:var(--s3);position:relative}\n.divider h2{font-size:88px;font-weight:800;line-height:1.15;letter-spacing:-.03em;position:relative;max-width:1100px}\n.divider p{font-size:28px;color:var(--sub);margin-top:var(--s3);position:relative}\n.divider .rule{height:6px;width:200px;background:var(--point);margin-top:var(--s5);transform-origin:left;position:relative}\n\n/* 3열 카드 */\n.cards3 .card{display:flex;flex-direction:column;gap:var(--s2);padding:var(--s3)}\n.cards3 .pic{height:250px}\n.cards3 h3{font-size:30px;font-weight:700;line-height:1.3}\n.cards3 p{font-size:22px;line-height:1.5;color:var(--sub)}\n.cards3 .n{font-size:18px;font-weight:700;color:var(--key)}\n\n/* 한 장 한 메시지: 왼쪽 근거 글, 오른쪽 근거 그림 하나 */\n.msg{display:grid;grid-template-columns:5fr 7fr;gap:var(--s6);align-items:center}\n.msg .big{font-size:120px;font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--key);font-variant-numeric:tabular-nums}\n.msg .cap{font-size:28px;line-height:1.5;margin-top:var(--s3)}\n.msg .cap small{display:block;font-size:20px;color:var(--sub);margin-top:var(--s1)}\n\n/* 막대 차트: 큰 순서로 정렬, 말할 막대 하나만 키컬러 */\n.bars{display:flex;flex-direction:column;gap:var(--s2)}\n.bars li{display:grid;grid-template-columns:220px 1fr 96px;align-items:center;gap:var(--s2);font-size:24px}\n.bars .t{color:var(--sub);text-align:right}\n.bars .b{height:40px;border-radius:6px;background:var(--mute);width:calc(var(--v)*1%);transform-origin:left;transform:scaleX(0);transition:transform .8s var(--out)}\n.bars .v{font-weight:700;font-variant-numeric:tabular-nums;color:var(--sub)}\n.bars .hl .t,.bars .hl .v{color:var(--ink);font-weight:700}\n.bars .hl .b{background:var(--key)}\n.on .bars .b{transform:scaleX(1)}\n.on .bars li:nth-child(2) .b{transition-delay:.06s}.on .bars li:nth-child(3) .b{transition-delay:.12s}\n.on .bars li:nth-child(4) .b{transition-delay:.18s}.on .bars li:nth-child(5) .b{transition-delay:.24s}\n\n/* 큰 숫자 셋 */\n.stats .card{padding:var(--s5) var(--s4)}\n.stats .n{font-size:104px;font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}\n.stats .n small{font-size:.4em;font-weight:700;margin-left:4px;letter-spacing:0}\n.stats .card:first-child .n{color:var(--key)}\n.stats .l{font-size:26px;font-weight:700;margin-top:var(--s3)}\n.stats .d{font-size:20px;color:var(--sub);margin-top:var(--s1);line-height:1.5}\n\n/* 사진 + 글 (1:2 — 반반은 초점이 흐려진다) */\n.split{display:grid;grid-template-columns:1fr 2fr;gap:var(--s6);align-items:center;height:100%}\n.split.rev{grid-template-columns:2fr 1fr}\n.split .pic{height:520px}\n.split .tx p{font-size:28px;line-height:1.6}\n.split .tx p+p{margin-top:var(--s3)}\n\n/* 번호 목록 */\n.nlist{display:flex;flex-direction:column}\n.nlist li{display:grid;grid-template-columns:140px 1fr;align-items:baseline;padding:var(--s3) 0;border-bottom:1.5px solid var(--line)}\n.nlist li:first-child{border-top:3px solid var(--ink)}\n.nlist .n{font-size:64px;font-weight:200;line-height:1;color:var(--mute);font-variant-numeric:tabular-nums}\n.nlist b{font-size:34px;font-weight:700}\n.nlist span{display:block;font-size:22px;color:var(--sub);margin-top:var(--s1)}\n.nlist li.hl .n{color:var(--key)}\n\n/* 타임라인 4칸 */\n.tl{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}\n.tl::before{content:\"\";position:absolute;left:0;right:0;top:19px;border-top:3px dotted var(--line)}\n.tl .y{display:inline-block;position:relative;background:var(--bg);padding-right:var(--s2);font-size:26px;font-weight:800;color:var(--key)}\n.tl .y::before{content:\"\";display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--key);margin-right:var(--s1)}\n.tl h3{font-size:28px;font-weight:700;margin-top:var(--s3)}\n.tl p{font-size:21px;line-height:1.5;color:var(--sub);margin-top:var(--s1)}\n.tl li:last-child .y{color:var(--point)}.tl li:last-child .y::before{background:var(--point)}\n\n/* 비교표 */\n.tbl{width:100%;border-collapse:collapse;font-size:24px}\n.tbl th{text-align:left;font-size:20px;font-weight:700;color:var(--sub);padding:var(--s2);border-bottom:3px solid var(--ink)}\n.tbl td{padding:20px var(--s2);border-bottom:1.5px solid var(--line);line-height:1.4}\n.tbl tr:nth-child(even) td{background:var(--zebra)}\n.tbl td:first-child{font-weight:700;width:240px}\n.tbl .k{font-weight:700;color:var(--key)}\n\n/* 단계 카드 */\n.steps .card{position:relative;padding:var(--s3)}\n.steps .n{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--key);color:var(--on-key);font-size:24px;font-weight:800}\n.steps h3{font-size:28px;font-weight:700;margin-top:var(--s2)}\n.steps p{font-size:21px;line-height:1.5;color:var(--sub);margin-top:var(--s1)}\n.steps .card:last-child .n{background:var(--point)}\n\n/* 인용 */\n.quote{display:grid;grid-template-columns:1fr 2fr;gap:var(--s6);align-items:center}\n.quote .pic{height:440px}\n.quote blockquote{font-size:44px;font-weight:700;line-height:1.45;letter-spacing:-.01em}\n.quote blockquote::before{content:\"“\";display:block;font-size:120px;line-height:.6;color:var(--key);margin-bottom:var(--s2)}\n.quote .chips{display:flex;align-items:center;gap:var(--s1);margin-top:var(--s4);color:var(--sub);font-size:22px}\n\n/* 전·후 대비 (좌우 색이 갈린다) */\n.vs{padding:0;flex-direction:row}\n.vs>.before,.vs>.after{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--m);background:var(--bg);color:var(--ink)}\n.vs .lbl{font-size:20px;font-weight:700;letter-spacing:.2em;color:var(--sub);margin-bottom:var(--s3)}\n.vs h3{font-size:64px;font-weight:300;line-height:1.2;letter-spacing:-.02em}\n.vs .after h3{font-weight:800}\n.vs p{font-size:24px;line-height:1.5;color:var(--sub);margin-top:var(--s3)}\n.vs .mid{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:var(--point);flex:none;padding:0}\n.vs .foot span{visibility:hidden}\n\n/* 콜아웃: 캡처에서 한 곳만 짚는다 */\n.callout{position:relative;height:100%}\n.callout .ring{position:absolute;border:4px solid var(--point);border-radius:10px;box-shadow:0 0 0 2000px rgba(19,44,61,.45)}\n.callout .tag{position:absolute;background:var(--point);color:#fff;font-size:22px;font-weight:700;padding:8px 16px;border-radius:var(--r-pill);white-space:nowrap}\n.callout .frame{position:relative;height:100%;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line)}\n\n/* 전면 이미지 */\n.full{padding:0}\n.full>img,.full>.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0;border:0}\n.full .scrim{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(transparent,rgba(10,20,28,.78))}\n.full .cap{position:absolute;left:var(--m);bottom:var(--s6);right:var(--m);color:#fff;font-size:56px;font-weight:800;line-height:1.25;letter-spacing:-.02em}\n\n/* 참고문헌 · 감사 */\n.refs li{font-size:22px;line-height:1.5;padding:12px 0;border-bottom:1.5px solid var(--line);color:var(--sub)}\n.refs li b{color:var(--ink)}\n.thanks .cv{flex:1;display:grid;grid-template-columns:1fr 360px;gap:var(--s6);align-items:center}\n.thanks h2{font-size:104px;font-weight:800;letter-spacing:-.03em;line-height:1.1}\n.thanks .say{font-size:34px;font-weight:600;line-height:1.5;margin-top:var(--s4)}\n.thanks .who{font-size:26px;font-weight:700;color:var(--key);margin-top:var(--s5)}\n.qr{padding:var(--s3);text-align:center}\n.qr .ph,.qr img{width:100%;aspect-ratio:1}\n.qr p{font-size:20px;font-weight:700;margin-top:var(--s2)}\n\n/* ═════════ 4. 움직임 — 등장은 한 가지(아래에서 위로), 간격 60ms, 전체 0.8초 안 ═════════ */\n[data-step]{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--out),transform .5s var(--out)}\n[data-step].shown{opacity:1;transform:none}\n[data-fx=\"fade\"]{transform:none}\n[data-fx=\"pop\"]{transform:scale(.9)}[data-fx=\"pop\"].shown{transition-timing-function:var(--out),var(--over)}\n.stag>*{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--out),transform .5s var(--out);transition-delay:calc(var(--i,0)*60ms)}\n.on .stag:not([data-step])>*,.stag.shown>*{opacity:1;transform:none}\n.stag[data-step]{opacity:1;transform:none}\n.grow{transform:scaleX(0);transition:transform .6s var(--out) .25s}.on .grow{transform:scaleX(1)}\n.kin span{display:inline-block;opacity:0;transform:translateY(.5em);transition:opacity .35s var(--out),transform .5s var(--out);transition-delay:calc(var(--i)*45ms)}\n.on .kin span{opacity:1;transform:none}\n/* 장 전환: 기본은 페이드 하나. 간지처럼 크게 바뀌는 곳에만 data-tr 를 붙인다 */\n.slide.on{animation:tr-fade var(--dur) var(--smooth) both}\n.slide.on[data-tr=\"wipe\"]{animation:tr-wipe .45s var(--out) both}\n.slide.on[data-tr=\"circle\"]{animation:tr-circle .5s var(--out) both}\n.slide.on[data-tr=\"slice\"]{animation:tr-slice .45s var(--out) both}\n@keyframes tr-fade{from{opacity:0}}\n@keyframes tr-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}\n@keyframes tr-circle{from{clip-path:circle(0% at 50% 50%)}to{clip-path:circle(120% at 50% 50%)}}\n@keyframes tr-slice{from{clip-path:polygon(0 0,0 0,-20% 100%,-20% 100%)}to{clip-path:polygon(0 0,120% 0,100% 100%,-20% 100%)}}\n@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:1ms!important;transition-delay:0s!important;animation-duration:1ms!important}}\n\n/* ═════════ 5. 발표 도구 ═════════ */\n#hud{position:fixed;right:16px;bottom:16px;z-index:30;display:flex;gap:6px;opacity:0;transition:opacity .3s}\nbody.move #hud{opacity:1}\n#hud button{width:44px;height:44px;border:0;border-radius:10px;background:rgba(19,44,61,.82);color:#fff;font:600 18px var(--sans);cursor:pointer}\n#hud button:hover{background:#18766B}\n#np{position:fixed;left:0;right:0;bottom:0;z-index:25;max-height:38vh;overflow:auto;background:rgba(13,26,34,.95);color:#F1EFE8;padding:20px 28px 24px;font:400 20px/1.7 var(--sans);white-space:pre-wrap;display:none}\n#np.on{display:block}\n#np h4{margin:0 0 8px;font-size:15px;font-weight:700;color:#7FD1C1;letter-spacing:.06em}\n#ov{position:fixed;inset:0;z-index:40;background:rgba(13,26,34,.96);overflow:auto;padding:32px;display:none}\n#ov.on{display:block}\n#ov ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:0;padding:0;list-style:none}\n#ov li{background:#FBFAF6;color:#132C3D;border-radius:10px;padding:14px 16px;min-height:92px;cursor:pointer;font:700 17px/1.4 var(--sans);border:3px solid transparent}\n#ov li.cur{border-color:#D9734E}\n#ov li i{display:block;font:500 13px var(--sans);color:#586875;font-style:normal;margin-bottom:6px}\n#help{position:fixed;inset:0;z-index:45;background:rgba(13,26,34,.92);color:#F1EFE8;display:none;align-items:center;justify-content:center;font:400 20px/2 var(--sans)}\n#help.on{display:flex}\n#help kbd{display:inline-block;min-width:36px;text-align:center;padding:0 10px;margin-right:12px;border-radius:6px;background:#F1EFE8;color:#132C3D;font:700 16px/30px var(--sans)}\n#lb{position:fixed;inset:0;z-index:50;background:rgba(13,26,34,.9);display:none;align-items:center;justify-content:center;cursor:zoom-out}\n#lb.on{display:flex}#lb img{max-width:92vw;max-height:90vh;border-radius:12px}\n\n/* 인쇄·PDF: 한 장이 한 쪽, 모든 단계가 보인 상태 */\n@media print{\n  @page{size:1600px 900px;margin:0}\n  html,body{height:auto;overflow:visible;background:none}\n  #stage{position:static;transform:none!important;width:1600px;height:auto;overflow:visible}\n  .slide{position:relative;visibility:visible!important;opacity:1!important;height:900px;break-after:page;animation:none!important}\n  [data-step],.stag>*,.kin span{opacity:1!important;transform:none!important}\n  .grow,.bars .b{transform:none!important}\n  #hud,#np,#ov,#help,#lb,#bar{display:none!important}\n}\n\n/* ═════════ 6. 꾸미기 옵션 — #stage 의 data-* 로 켠다 ═════════ */\n.title,.cover h1,.divider h2,.thanks h2,.full .cap{font-family:var(--title-font,var(--sans));font-weight:var(--title-weight,800)}\n[data-card=\"shadow\"] .card{border-color:transparent;box-shadow:0 10px 28px rgba(19,44,61,.09)}\n[data-card=\"fill\"] .card{border-color:transparent;background:var(--paper)}\n[data-pattern=\"grid\"] .slide:not(.full):not(.vs){background-image:linear-gradient(color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px);background-size:40px 40px}\n[data-pattern=\"dots\"] .slide:not(.full):not(.vs){background-image:radial-gradient(color-mix(in srgb,var(--key) 24%,transparent) 1.6px,transparent 2px);background-size:32px 32px}\n[data-titlefx=\"bar\"] .title::after{content:\"\";display:block;width:88px;height:6px;border-radius:3px;background:var(--key);margin-top:var(--s2)}\n[data-titlefx=\"marker\"] .title{text-decoration:underline;text-decoration-color:var(--key-soft);text-decoration-thickness:.34em;text-underline-offset:-.14em;text-decoration-skip-ink:none}\n[data-titlefx=\"marker\"] .lead{margin-top:var(--s3)}\n[data-motion=\"calm\"] [data-step],[data-motion=\"calm\"] .stag>*,[data-motion=\"calm\"] .kin span{transform:none}\n[data-motion=\"off\"] *,[data-motion=\"off\"] *::before,[data-motion=\"off\"] *::after{transition-duration:1ms!important;transition-delay:0s!important;animation-duration:1ms!important}\n\u003c/style>\n\u003cstyle id=\"my-theme\">/*MY-THEME*/\u003c/style>\n\u003c/head>\n\u003cbody>\n\n\u003c!-- 덱 정보: 바닥글이 여기서 만들어진다. data-theme 은 nalssam(기본) · chalk · navy -->\n\u003cdiv id=\"stage\" data-theme=\"nalssam\" data-card=\"line\" data-pattern=\"none\" data-titlefx=\"none\" data-motion=\"basic\" data-event=\"날쌤 HTML PPT 견본\" data-author=\"nalssam 박준호\" data-date=\"2026. 11. 21.(토)\">\n\n\u003c!-- 01 표지 -->\n\u003csection class=\"slide cover\" data-title=\"표지\">\n  \u003ci class=\"rule grow\">\u003c/i>\n  \u003cdiv class=\"cv\">\n    \u003cdiv>\n      \u003ch1 class=\"kin\">말하듯 넘기는\u003cbr>한 장짜리 발표\u003c/h1>\n      \u003cp class=\"say\" data-step=\"1\">내용만 쓰면 얼굴은 늘 같아요\u003c/p>\n      \u003cp class=\"who\" data-step=\"1\">견본 덱 · 장표 유형 18가지\u003c/p>\n    \u003c/div>\n    \u003cdiv class=\"ph hero\" data-step=\"1\" data-fx=\"fade\">\u003cb>표지 그림 자리\u003c/b>01_표지 · 4:3 클레이 오브젝트\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">1장 · 1분\n안녕하세요. 이 덱은 날쌤 HTML PPT 스킬의 견본입니다. 장마다 이렇게 대본이 붙어 있고, N 키를 누르면 보입니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 02 오늘의 질문 (3열 카드) -->\n\u003csection class=\"slide\" data-title=\"오늘의 질문\">\n  \u003cdiv class=\"kicker\">01 시작\u003c/div>\n  \u003ch2 class=\"title\">오늘은 세 가지만 가져가면 돼요\u003c/h2>\n  \u003cp class=\"lead\">제목은 이름표가 아니라 결론 한 문장으로 씁니다\u003c/p>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"g3 cards3 stag\">\n      \u003cdiv class=\"card\">\u003cdiv class=\"ph pic\">\u003cb>그림 자리\u003c/b>02_질문1\u003c/div>\u003cspan class=\"n\">Q1\u003c/span>\u003ch3>무엇을 말할까\u003c/h3>\u003cp>한 장에 메시지 하나만 남겨요\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\">\u003cdiv class=\"ph pic\">\u003cb>그림 자리\u003c/b>02_질문2\u003c/div>\u003cspan class=\"n\">Q2\u003c/span>\u003ch3>어떻게 보일까\u003c/h3>\u003cp>크기와 여백으로 순서를 만들어요\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\">\u003cdiv class=\"ph pic\">\u003cb>그림 자리\u003c/b>02_질문3\u003c/div>\u003cspan class=\"n\">Q3\u003c/span>\u003ch3>언제 움직일까\u003c/h3>\u003cp>읽는 순서가 있을 때만 움직여요\u003c/p>\u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">2장 · 2분\n오늘 가져갈 것은 세 가지입니다. 무엇을 말할지, 어떻게 보일지, 언제 움직일지. 이 세 가지만 가져가시면 됩니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 03 간지 -->\n\u003csection class=\"slide divider\" data-title=\"간지 · 구성\" data-theme=\"navy\" data-tr=\"wipe\">\n  \u003cdiv class=\"num\">01\u003c/div>\n  \u003cdiv class=\"lbl\">PART 01\u003c/div>\n  \u003ch2 class=\"kin\">무엇을 말할까\u003c/h2>\n  \u003cp data-step=\"1\">한 장에는 결론 하나와 근거 하나\u003c/p>\n  \u003ci class=\"rule grow\">\u003c/i>\n  \u003caside class=\"notes\">3장 · 30초\n첫 번째 이야기입니다. 한 장에 무엇을 말할지부터 정합니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 04 한 장 한 메시지 -->\n\u003csection class=\"slide\" data-title=\"한 장 한 메시지\">\n  \u003cdiv class=\"kicker\">01 구성\u003c/div>\n  \u003ch2 class=\"title\">주문의 절반이 아침 8시에 몰려요\u003c/h2>\n  \u003cp class=\"lead\">결론 제목 + 숫자 하나 + 그림 하나 (가상 예시)\u003c/p>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"msg\">\n      \u003cdiv>\n        \u003cdiv class=\"big\">\u003cspan data-count=\"52\">0\u003c/span>%\u003c/div>\n        \u003cp class=\"cap\">평일 오전 주문 1,240건 가운데 절반\u003csmall>(가상) 골목 카페 1년 돌아보기\u003c/small>\u003c/p>\n      \u003c/div>\n      \u003cul class=\"bars\">\n        \u003cli>\u003cspan class=\"t\">7시\u003c/span>\u003ci class=\"b\" style=\"--v:38\">\u003c/i>\u003cspan class=\"v\">18%\u003c/span>\u003c/li>\n        \u003cli class=\"hl\">\u003cspan class=\"t\">8시\u003c/span>\u003ci class=\"b\" style=\"--v:100\">\u003c/i>\u003cspan class=\"v\">52%\u003c/span>\u003c/li>\n        \u003cli>\u003cspan class=\"t\">9시\u003c/span>\u003ci class=\"b\" style=\"--v:42\">\u003c/i>\u003cspan class=\"v\">21%\u003c/span>\u003c/li>\n        \u003cli>\u003cspan class=\"t\">10시\u003c/span>\u003ci class=\"b\" style=\"--v:18\">\u003c/i>\u003cspan class=\"v\">9%\u003c/span>\u003c/li>\n      \u003c/ul>\n    \u003c/div>\n    \u003cdiv class=\"band\" data-step=\"1\">그래서 \u003cb>8시 전 예약 주문\u003c/b>을 먼저 엽니다\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">4장 · 2분\n제목이 곧 결론입니다. 주문의 절반이 아침 8시에 몰립니다. 화면의 숫자는 가상 예시입니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 05 차트 -->\n\u003csection class=\"slide\" data-title=\"정렬한 막대 차트\">\n  \u003cdiv class=\"kicker\">01 구성\u003c/div>\n  \u003ch2 class=\"title\">아이스 아메리카노가 3잔 중 1잔이에요\u003c/h2>\n  \u003cp class=\"lead\">큰 순서로 정렬하고, 말할 막대 하나만 색을 씁니다 (가상 예시)\u003c/p>\n  \u003cdiv class=\"body\">\n    \u003cul class=\"bars\">\n      \u003cli class=\"hl\">\u003cspan class=\"t\">아이스 아메리카노\u003c/span>\u003ci class=\"b\" style=\"--v:100\">\u003c/i>\u003cspan class=\"v\">34%\u003c/span>\u003c/li>\n      \u003cli>\u003cspan class=\"t\">카페 라테\u003c/span>\u003ci class=\"b\" style=\"--v:65\">\u003c/i>\u003cspan class=\"v\">22%\u003c/span>\u003c/li>\n      \u003cli>\u003cspan class=\"t\">오트 라테\u003c/span>\u003ci class=\"b\" style=\"--v:50\">\u003c/i>\u003cspan class=\"v\">17%\u003c/span>\u003c/li>\n      \u003cli>\u003cspan class=\"t\">콜드브루\u003c/span>\u003ci class=\"b\" style=\"--v:44\">\u003c/i>\u003cspan class=\"v\">15%\u003c/span>\u003c/li>\n      \u003cli>\u003cspan class=\"t\">말차 라테\u003c/span>\u003ci class=\"b\" style=\"--v:35\">\u003c/i>\u003cspan class=\"v\">12%\u003c/span>\u003c/li>\n    \u003c/ul>\n    \u003cp class=\"src\">(가상) 메뉴별 판매 비율 · 값은 막대 끝 숫자로도 표시\u003c/p>\n  \u003c/div>\n  \u003caside class=\"notes\">5장 · 2분\n차트는 큰 순서로 정렬하고, 말하고 싶은 막대 하나만 색을 칠합니다. 아이스 아메리카노가 세 잔 중 한 잔입니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 06 큰 숫자 셋 -->\n\u003csection class=\"slide\" data-title=\"큰 숫자 셋\">\n  \u003cdiv class=\"kicker\">01 구성\u003c/div>\n  \u003ch2 class=\"title\">숫자는 셋까지만 크게 보여 줘요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"g3 stats stag\">\n      \u003cdiv class=\"card\">\u003cdiv class=\"n\">\u003cspan data-count=\"12400\">0\u003c/span>\u003csmall>잔\u003c/small>\u003c/div>\u003cdiv class=\"l\">올해 판매\u003c/div>\u003cdiv class=\"d\">(가상) 하루 평균 34잔\u003c/div>\u003c/div>\n      \u003cdiv class=\"card\">\u003cdiv class=\"n\">\u003cspan data-count=\"4.8\" data-dec=\"1\">0\u003c/span>\u003c/div>\u003cdiv class=\"l\">평균 별점\u003c/div>\u003cdiv class=\"d\">(가상) 후기 620건 기준\u003c/div>\u003c/div>\n      \u003cdiv class=\"card\">\u003cdiv class=\"n\">\u003cspan data-count=\"38\">0\u003c/span>\u003csmall>%\u003c/small>\u003c/div>\u003cdiv class=\"l\">앱 주문 비율\u003c/div>\u003cdiv class=\"d\">(가상) 지난해보다 늘었어요\u003c/div>\u003c/div>\n    \u003c/div>\n    \u003cdiv class=\"band\" data-step=\"1\">문단 속 숫자는 읽어야 보이고, \u003cb>큰 숫자 셋\u003c/b>은 보기만 해도 남아요\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">6장 · 1분 30초\n숫자는 셋까지만 크게 보여 줍니다. 열 개를 다 그리지 말고 고르는 것이 먼저입니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 07 사진 + 글 -->\n\u003csection class=\"slide\" data-title=\"사진과 글\">\n  \u003cdiv class=\"kicker\">02 배치\u003c/div>\n  \u003ch2 class=\"title\">반반보다 1대 2가 주인공을 살려요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"split\">\n      \u003cdiv class=\"ph pic\">\u003cb>사진 자리\u003c/b>07_교실 · 3:4\u003c/div>\n      \u003cdiv class=\"tx\">\n        \u003cp>반반으로 나누면 두 쪽의 무게가 같아 \u003cem>무엇이 주인공인지\u003c/em> 흐려져요.\u003c/p>\n        \u003cp data-step=\"1\">주인공 쪽을 넓게 주면 시선이 먼저 갑니다.\u003c/p>\n        \u003cp data-step=\"2\" class=\"pt\">\u003cb>글이 주인공이면 글을 2로 둡니다.\u003c/b>\u003c/p>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">7장 · 1분 30초\n사진과 글을 나눌 때는 반반보다 일 대 이가 좋습니다. 주인공 쪽을 넓게 줍니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 08 번호 목록 -->\n\u003csection class=\"slide\" data-title=\"번호 목록\">\n  \u003cdiv class=\"kicker\">02 배치\u003c/div>\n  \u003ch2 class=\"title\">세 단계면 한 장이 정리돼요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003col class=\"nlist\">\n      \u003cli class=\"hl\" data-step=\"1\">\u003cspan class=\"n\">01\u003c/span>\u003cdiv>\u003cb>결론을 제목에 쓴다\u003c/b>\u003cspan>\"현황\"·\"분석\" 같은 이름표 제목은 쓰지 않아요\u003c/span>\u003c/div>\u003c/li>\n      \u003cli data-step=\"2\">\u003cspan class=\"n\">02\u003c/span>\u003cdiv>\u003cb>근거를 하나만 남긴다\u003c/b>\u003cspan>나머지는 다음 장으로 보내요\u003c/span>\u003c/div>\u003c/li>\n      \u003cli data-step=\"3\">\u003cspan class=\"n\">03\u003c/span>\u003cdiv>\u003cb>여백을 두 배로 늘린다\u003c/b>\u003cspan>내용을 빼기 전에 간격부터 넓혀요\u003c/span>\u003c/div>\u003c/li>\n    \u003c/ol>\n  \u003c/div>\n  \u003caside class=\"notes\">8장 · 2분\n세 단계입니다. 결론을 제목에 쓰고, 근거를 하나만 남기고, 여백을 두 배로 늘립니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 09 타임라인 -->\n\u003csection class=\"slide\" data-title=\"타임라인\">\n  \u003cdiv class=\"kicker\">02 배치\u003c/div>\n  \u003ch2 class=\"title\">네 칸으로 흐름을 보여 줘요\u003c/h2>\n  \u003cp class=\"lead\">마지막 칸만 포인트 색 · 연도가 발표자 정리면 각주에 밝힙니다\u003c/p>\n  \u003cdiv class=\"body\">\n    \u003col class=\"tl stag\">\n      \u003cli>\u003cspan class=\"y\">1단계\u003c/span>\u003ch3>내용 받기\u003c/h3>\u003cp>글이나 자료를 먼저 받아요\u003c/p>\u003c/li>\n      \u003cli>\u003cspan class=\"y\">2단계\u003c/span>\u003ch3>장 목록\u003c/h3>\u003cp>결론 문장으로 목록을 짜요\u003c/p>\u003c/li>\n      \u003cli>\u003cspan class=\"y\">3단계\u003c/span>\u003ch3>조립\u003c/h3>\u003cp>견본 장을 복사해 채워요\u003c/p>\u003c/li>\n      \u003cli>\u003cspan class=\"y\">4단계\u003c/span>\u003ch3>점검\u003c/h3>\u003cp>전체 화면을 눈으로 봐요\u003c/p>\u003c/li>\n    \u003c/ol>\n    \u003cp class=\"src\">※ 발표자 정리\u003c/p>\n  \u003c/div>\n  \u003caside class=\"notes\">9장 · 1분 30초\n흐름은 네 칸으로 보여 줍니다. 마지막 칸만 색을 달리해 도착점을 알립니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 10 비교표 -->\n\u003csection class=\"slide\" data-title=\"비교표\">\n  \u003cdiv class=\"kicker\">02 배치\u003c/div>\n  \u003ch2 class=\"title\">표는 핵심 열 하나만 진하게 써요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003ctable class=\"tbl\">\n      \u003ctr>\u003cth>구분\u003c/th>\u003cth>PPTX\u003c/th>\u003cth>HTML PPT\u003c/th>\u003c/tr>\n      \u003ctr>\u003ctd>결과물\u003c/td>\u003ctd>파워포인트 파일\u003c/td>\u003ctd class=\"k\">브라우저로 여는 파일 하나\u003c/td>\u003c/tr>\n      \u003ctr>\u003ctd>움직임\u003c/td>\u003ctd>쓰지 않음\u003c/td>\u003ctd class=\"k\">등장·전환·숫자 올라가기\u003c/td>\u003c/tr>\n      \u003ctr>\u003ctd>대본\u003c/td>\u003ctd>슬라이드 메모\u003c/td>\u003ctd class=\"k\">N 키로 보는 대본 창\u003c/td>\u003c/tr>\n      \u003ctr>\u003ctd>나누기\u003c/td>\u003ctd>파일 보내기\u003c/td>\u003ctd class=\"k\">링크 하나 또는 PDF\u003c/td>\u003c/tr>\n    \u003c/table>\n    \u003cdiv class=\"band\" data-step=\"1\">같은 얼굴, \u003cb>다른 그릇\u003c/b>이에요\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">10장 · 2분\n표는 핵심 열 하나만 진하게 씁니다. 같은 얼굴에 그릇만 다릅니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 11 단계 카드 -->\n\u003csection class=\"slide\" data-title=\"단계 카드\">\n  \u003cdiv class=\"kicker\">03 움직임\u003c/div>\n  \u003ch2 class=\"title\">움직임은 네 가지 약속만 지켜요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"g4 steps\">\n      \u003cdiv class=\"card\" data-step=\"1\">\u003cspan class=\"n\">1\u003c/span>\u003ch3>하나로 통일\u003c/h3>\u003cp>전환은 페이드 하나, 0.3초\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\" data-step=\"2\">\u003cspan class=\"n\">2\u003c/span>\u003ch3>짧은 시차\u003c/h3>\u003cp>60ms 간격, 0.8초 안에 끝\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\" data-step=\"3\">\u003cspan class=\"n\">3\u003c/span>\u003ch3>한 문장만\u003c/h3>\u003cp>글자 등장은 표지와 간지에만\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\" data-step=\"4\">\u003cspan class=\"n\">4\u003c/span>\u003ch3>끌 수 있게\u003c/h3>\u003cp>움직임 줄이기 설정을 따라요\u003c/p>\u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">11장 · 2분\n움직임은 네 가지만 지킵니다. 하나로 통일하고, 시차는 짧게, 글자 등장은 한 문장만, 그리고 끌 수 있게 합니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 12 인용 -->\n\u003csection class=\"slide\" data-title=\"인용\">\n  \u003cdiv class=\"kicker\">03 움직임\u003c/div>\n  \u003ch2 class=\"title\">전환은 내용이 아니라 이음새예요\u003c/h2>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"quote\">\n      \u003cdiv class=\"ph pic\">\u003cb>그림 자리\u003c/b>12_이음새\u003c/div>\n      \u003cdiv>\n        \u003cblockquote>한 발표 안에서는\u003cbr>한 가지로 통일하고,\u003cbr>크게 바뀌는 곳에만 다르게.\u003c/blockquote>\n        \u003cdiv class=\"chips\" data-step=\"1\">\u003cspan class=\"chip\">본문 = 페이드\u003c/span>›\u003cspan class=\"chip\">간지 = 닦아내기\u003c/span>›\u003cspan class=\"chip pt\">0.5초 이내\u003c/span>\u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">12장 · 1분\n전환은 내용이 아니라 이음새입니다. 한 가지로 통일하고, 간지처럼 크게 바뀌는 곳에만 다르게 씁니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 13 전·후 대비 -->\n\u003csection class=\"slide vs\" data-title=\"전후 대비\" data-tr=\"slice\">\n  \u003cdiv class=\"before\" data-theme=\"navy\">\u003cdiv class=\"lbl\">BEFORE\u003c/div>\u003ch3>이름표 제목\u003cbr>글머리표 일곱 줄\u003c/h3>\u003cp>무엇을 말하려는지 끝까지 읽어야 알아요\u003c/p>\u003c/div>\n  \u003cdiv class=\"after\">\u003cdiv class=\"lbl\">AFTER\u003c/div>\u003ch3>결론 제목\u003cbr>\u003cem>근거 하나\u003c/em>\u003c/h3>\u003cp>1초만 봐도 한 가지가 남아요\u003c/p>\u003c/div>\n  \u003ci class=\"mid\">\u003c/i>\n  \u003caside class=\"notes\">13장 · 1분\n전과 후입니다. 이름표 제목과 글머리표 일곱 줄이, 결론 제목과 근거 하나로 바뀝니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 14 콜아웃 -->\n\u003csection class=\"slide\" data-title=\"콜아웃\">\n  \u003cdiv class=\"kicker\">04 화면\u003c/div>\n  \u003ch2 class=\"title\">캡처는 한 곳만 짚어 줘요\u003c/h2>\n  \u003cdiv class=\"body top\">\n    \u003cdiv class=\"callout\">\n      \u003cdiv class=\"frame\">\u003cdiv class=\"ph\" style=\"position:absolute;inset:0;border:0\">\u003cb>화면 캡처 자리\u003c/b>14_화면 · 16:9 · 개인정보는 가리기\u003c/div>\n        \u003ci class=\"ring\" data-step=\"1\" data-fx=\"fade\" style=\"left:62%;top:18%;width:22%;height:16%\">\u003c/i>\n      \u003c/div>\n      \u003cspan class=\"tag\" data-step=\"1\" style=\"left:62%;top:38%\">여기서 시작해요\u003c/span>\n    \u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">14장 · 1분 30초\n화면 캡처를 그대로 붙이면 어디를 봐야 할지 모릅니다. 한 곳만 짚고 나머지는 어둡게 합니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 15 전면 이미지 -->\n\u003csection class=\"slide full\" data-title=\"전면 이미지\" data-nofoot>\n  \u003cdiv class=\"ph\">\u003cb>전면 그림 자리\u003c/b>15_장면 · 16:9\u003c/div>\n  \u003cdiv class=\"scrim\">\u003c/div>\n  \u003cdiv class=\"cap\">끝까지 찬 사진은 자료가 아니라 장면이에요\u003c/div>\n  \u003caside class=\"notes\">15장 · 1분\n여백 안의 사진은 자료이고, 끝까지 찬 사진은 장면입니다. 글자 아래쪽만 어둡게 깝니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 16 칠판 테마 견본 -->\n\u003csection class=\"slide\" data-title=\"칠판 테마\" data-theme=\"chalk\">\n  \u003cdiv class=\"kicker\">05 테마\u003c/div>\n  \u003ch2 class=\"title\">칠판 테마는 한 장에만 써도 돼요\u003c/h2>\n  \u003cp class=\"lead\">장에 data-theme=\"chalk\" 를 붙이면 그 장만 바뀝니다\u003c/p>\n  \u003cdiv class=\"body\">\n    \u003cdiv class=\"g3 cards3 stag\">\n      \u003cdiv class=\"card\">\u003cspan class=\"n\">nalssam\u003c/span>\u003ch3>웜 오프화이트\u003c/h3>\u003cp>기본. 연수와 수업에 써요\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\">\u003cspan class=\"n\">chalk\u003c/span>\u003ch3>칠판\u003c/h3>\u003cp>질문·활동 장에 어울려요\u003c/p>\u003c/div>\n      \u003cdiv class=\"card\">\u003cspan class=\"n\">navy\u003c/span>\u003ch3>네이비\u003c/h3>\u003cp>간지와 강조 장에 써요\u003c/p>\u003c/div>\n    \u003c/div>\n    \u003cdiv class=\"band\" data-step=\"1\">색 이름이 아니라 \u003cb>역할 이름\u003c/b>으로 바꿔요: --key · --point\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">16장 · 1분\n테마는 세 가지입니다. 장 하나에만 붙여도 그 장만 바뀝니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 17 참고문헌 -->\n\u003csection class=\"slide\" data-title=\"참고문헌\">\n  \u003cdiv class=\"kicker\">참고\u003c/div>\n  \u003ch2 class=\"title\">출처는 한 장에 모아요\u003c/h2>\n  \u003cdiv class=\"body top\">\n    \u003cul class=\"refs\">\n      \u003cli>\u003cb>Design in words\u003c/b> — UI 디자인 용어 97 · designinwords.onpod.ai\u003c/li>\n      \u003cli>\u003cb>Remotion Scenes\u003c/b> — lifeprompt-team/remotion-scenes (MIT)\u003c/li>\n      \u003cli>\u003cb>ko/design.md\u003c/b> — 한국 서비스 디자인 카탈로그 · getdesign.kr\u003c/li>\n      \u003cli>그림 속 상표는 각 기업 소유 · 수치 예시는 모두 가상\u003c/li>\n    \u003c/ul>\n  \u003c/div>\n  \u003caside class=\"notes\">17장 · 30초\n출처는 화면으로 대신하겠습니다. 이 견본의 수치는 모두 가상 예시입니다.\u003c/aside>\n\u003c/section>\n\n\u003c!-- 18 감사 -->\n\u003csection class=\"slide thanks\" data-title=\"감사\" data-nofoot>\n  \u003cdiv class=\"cv\">\n    \u003cdiv>\n      \u003ch2 class=\"kin\">감사합니다\u003c/h2>\n      \u003cp class=\"say\" data-step=\"1\">내일 한 장만 바꿔 보세요\u003c/p>\n      \u003cp class=\"who\" data-step=\"1\">nalssam 박준호\u003c/p>\n    \u003c/div>\n    \u003cdiv class=\"card qr\" data-step=\"1\" data-fx=\"pop\">\u003cdiv class=\"ph\">\u003cb>QR 자리\u003c/b>18_QR\u003c/div>\u003cp>자료 받기\u003c/p>\u003c/div>\n  \u003c/div>\n  \u003caside class=\"notes\">18장 · 1분\n들어 주셔서 감사합니다. 내일 한 장만 바꿔 보시면 좋겠습니다. 자료는 화면의 QR에서 받으실 수 있습니다.\u003c/aside>\n\u003c/section>\n\n\u003ci id=\"bar\">\u003c/i>\n\u003c/div>\n\n\u003cdiv id=\"hud\">\u003cbutton data-a=\"prev\" title=\"이전\">‹\u003c/button>\u003cbutton data-a=\"next\" title=\"다음\">›\u003c/button>\u003cbutton data-a=\"ov\" title=\"목록 (G)\">▦\u003c/button>\u003cbutton data-a=\"notes\" title=\"대본 (N)\">N\u003c/button>\u003cbutton data-a=\"full\" title=\"전체 화면 (F)\">⛶\u003c/button>\u003cbutton data-a=\"help\" title=\"도움말 (?)\">?\u003c/button>\u003c/div>\n\u003cdiv id=\"np\">\u003c/div>\n\u003cdiv id=\"ov\">\u003col>\u003c/ol>\u003c/div>\n\u003cdiv id=\"help\">\u003cdiv>\u003ckbd>→\u003c/kbd>\u003ckbd>Space\u003c/kbd>다음 단계 · 다음 장\u003cbr>\u003ckbd>←\u003c/kbd>이전\u003cbr>\u003ckbd>PgDn\u003c/kbd>\u003ckbd>PgUp\u003c/kbd>장 단위로 넘기기\u003cbr>\u003ckbd>숫자\u003c/kbd>\u003ckbd>Enter\u003c/kbd>그 장으로\u003cbr>\u003ckbd>G\u003c/kbd>목록 &nbsp; \u003ckbd>N\u003c/kbd>대본 &nbsp; \u003ckbd>F\u003c/kbd>전체 화면 &nbsp; \u003ckbd>P\u003c/kbd>인쇄·PDF\u003c/div>\u003c/div>\n\u003cdiv id=\"lb\">\u003cimg alt=\"\">\u003c/div>\n\n\u003cscript>\n/* 날쌤 HTML PPT 엔진 — 고치지 않는다. 장은 위 \u003csection> 만 바꾼다. */\n(function(){\n  var stage=document.getElementById('stage'),S=[].slice.call(stage.querySelectorAll('.slide')),N=S.length,cur=-1,step=0,num='';\n  var bar=document.getElementById('bar'),np=document.getElementById('np'),ov=document.getElementById('ov'),help=document.getElementById('help'),lb=document.getElementById('lb');\n  function fit(){var k=Math.min(innerWidth/1600,innerHeight/900);stage.style.transform='scale('+k+') translate(-50%,-50%)'}\n  addEventListener('resize',fit);fit();\n  function pad(n){return (n\u003c10?'0':'')+n}\n  S.forEach(function(s,i){\n    s.dataset.n=i+1;\n    if(!s.hasAttribute('data-nofoot')&&!s.classList.contains('cover')){\n      var f=document.createElement('div');f.className='foot';\n      var d=stage.dataset,t=[d.event,d.author,d.date].filter(Boolean).join('  |  ');\n      f.innerHTML='\u003cspan>\u003c/span>\u003cb>'+pad(i+1)+' / '+pad(N)+'\u003c/b>';f.firstChild.textContent=t;s.appendChild(f);\n    }\n    [].forEach.call(s.querySelectorAll('.stag'),function(g){[].forEach.call(g.children,function(c,j){c.style.setProperty('--i',j)})});\n    [].forEach.call(s.querySelectorAll('.kin'),function(k){var i=0,n=k.textContent.replace(/\\s/g,'').length,cap=Math.min(1,20/Math.max(n,1));\n      [].slice.call(k.childNodes).forEach(function(nd){if(nd.nodeType!==3)return;var fr=document.createDocumentFragment();\n        nd.textContent.split('').forEach(function(ch){if(ch===' '){fr.appendChild(document.createTextNode(' '));return}var sp=document.createElement('span');sp.textContent=ch;sp.style.setProperty('--i',(i++*cap).toFixed(2));fr.appendChild(sp)});\n        k.replaceChild(fr,nd)})});\n    var li=document.createElement('li');li.innerHTML='\u003ci>'+pad(i+1)+'\u003c/i>';li.appendChild(document.createTextNode(s.dataset.title||''));li.onclick=function(){ov.classList.remove('on');go(i,0)};ov.firstElementChild.appendChild(li);\n  });\n  function steps(s){var m=0;[].forEach.call(s.querySelectorAll('[data-step]'),function(e){m=Math.max(m,+e.dataset.step)});return m}\n  function paint(){var s=S[cur];[].forEach.call(s.querySelectorAll('[data-step]'),function(e){var on=+e.dataset.step\u003c=step,was=e.classList.contains('shown');e.classList.toggle('shown',on);if(on&&!was)count(e)})}\n  function count(root){[].forEach.call(root.querySelectorAll('[data-count]'),function(e){\n    if(e.closest('[data-step]:not(.shown)'))return;var to=+e.dataset.count,dec=+(e.dataset.dec||0),t0=performance.now(),D=900;\n    if(matchMedia('(prefers-reduced-motion:reduce)').matches){e.textContent=fmt(to,dec);return}\n    (function tick(t){var p=Math.min(1,(t-t0)/D),v=to*(1-Math.pow(1-p,4));e.textContent=fmt(v,dec);if(p\u003c1)requestAnimationFrame(tick)})(t0)})}\n  function fmt(v,dec){return dec?v.toFixed(dec):Math.round(v).toLocaleString('ko-KR')}\n  function go(i,st){i=Math.max(0,Math.min(N-1,i));\n    if(i!==cur){var old=S[cur];S.forEach(function(s){s.classList.remove('out')});if(old){old.classList.remove('on');old.classList.add('out');setTimeout(function(){old.classList.remove('out')},520)}\n      cur=i;step=st===-1?steps(S[i]):(st||0);S[i].classList.add('on');paint();count(S[i]);\n    }else{step=st||0;paint()}\n    bar.style.width=((cur+1)/N*100)+'%';try{history.replaceState(null,'','#'+(cur+1))}catch(e){}\n    var n=S[cur].querySelector('.notes');np.innerHTML='\u003ch4>'+pad(cur+1)+' / '+pad(N)+' · '+(S[cur].dataset.title||'')+'\u003c/h4>';np.appendChild(document.createTextNode(n?n.textContent.trim():'(대본 없음)'));\n    [].forEach.call(ov.querySelectorAll('li'),function(l,j){l.classList.toggle('cur',j===cur)});\n  }\n  function next(){if(step\u003csteps(S[cur])){step++;paint()}else go(cur+1,0)}\n  function prev(){if(step>0){step--;paint()}else go(cur-1,-1)}\n  function full(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}\n  var act={next:next,prev:prev,ov:function(){ov.classList.toggle('on')},notes:function(){np.classList.toggle('on')},full:full,help:function(){help.classList.toggle('on')}};\n  addEventListener('keydown',function(e){\n    if(e.metaKey||e.ctrlKey||e.altKey)return;var k=e.key;\n    if(lb.classList.contains('on')){lb.classList.remove('on');return}\n    if(k==='Escape'){ov.classList.remove('on');help.classList.remove('on');np.classList.remove('on');num='';return}\n    if(/^[0-9]$/.test(k)){num+=k;return}\n    if(k==='Enter'&&num){go(+num-1,0);num='';return}\n    if(k==='ArrowRight'||k===' '||k==='Enter'){e.preventDefault();next()}\n    else if(k==='ArrowLeft'||k==='Backspace'){e.preventDefault();prev()}\n    else if(k==='ArrowDown'||k==='PageDown'){e.preventDefault();go(cur+1,0)}\n    else if(k==='ArrowUp'||k==='PageUp'){e.preventDefault();go(cur-1,0)}\n    else if(k==='Home')go(0,0);else if(k==='End')go(N-1,0);\n    else if(k==='g'||k==='G')act.ov();else if(k==='n'||k==='N')act.notes();else if(k==='f'||k==='F')full();\n    else if(k==='p'||k==='P')print();else if(k==='?')act.help();\n  });\n  document.getElementById('hud').addEventListener('click',function(e){var b=e.target.closest('button');if(b)act[b.dataset.a]()});\n  help.onclick=function(){help.classList.remove('on')};lb.onclick=function(){lb.classList.remove('on')};\n  stage.addEventListener('click',function(e){var im=e.target.closest('img.zoom');if(im){lb.firstElementChild.src=im.currentSrc||im.src;lb.classList.add('on')}});\n  var tx=0,mt;addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});\n  addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)(d\u003c0?next:prev)()},{passive:true});\n  addEventListener('mousemove',function(){document.body.classList.add('move');clearTimeout(mt);mt=setTimeout(function(){document.body.classList.remove('move')},2000)});\n  addEventListener('beforeprint',function(){S.forEach(function(s){[].forEach.call(s.querySelectorAll('[data-count]'),function(e){e.textContent=fmt(+e.dataset.count,+(e.dataset.dec||0))})})});\n  window.deck={go:go,next:next,prev:prev,count:N,steps:function(i){return steps(S[i])},cur:function(){return cur}};\n  go(Math.max(0,(parseInt(location.hash.slice(1),10)||1)-1),0);\n})();\n\u003c/script>\n\u003c/body>\n\u003c/html>\n","scripts/check.js":"// 날쌤 HTML PPT 점검: 모든 장을 마지막 단계까지 펼쳐 캡처하고 넘침·대본·제목을 검사한다.\n// 사용: node check.js 덱.html 출력폴더 [--mobile]\n// (Playwright 를 찾지 못하면: NODE_PATH=$(npm root -g) node check.js …)\nconst path = require('path'), fs = require('fs');\nconst { chromium } = require('playwright');\n\n(async () => {\n  const file = path.resolve(process.argv[2]), out = process.argv[3] || 'shots';\n  const mobile = process.argv.includes('--mobile');\n  fs.mkdirSync(out, { recursive: true });\n  const browser = await chromium.launch();\n  const page = await browser.newPage({ viewport: mobile ? { width: 390, height: 844 } : { width: 1600, height: 900 } });\n  const errors = [];\n  page.on('pageerror', e => errors.push('스크립트 오류: ' + e.message));\n  await page.goto('file://' + file);\n  await page.waitForTimeout(600);\n  const n = await page.evaluate(() => window.deck.count);\n  const warn = [], titles = new Set();\n\n  for (let i = 0; i \u003c n; i++) {\n    await page.evaluate(i => { const d = window.deck; d.go(i, 0); for (let k = 0; k \u003c d.steps(i); k++) d.next(); }, i);\n    await page.waitForTimeout(1300);\n    await page.screenshot({ path: `${out}/s${String(i + 1).padStart(2, '0')}.png` });\n    const r = await page.evaluate(() => {\n      const s = document.querySelector('.slide.on'), k = s.getBoundingClientRect().width / 1600, R = s.getBoundingClientRect(), o = [];\n      const foot = s.querySelector('.foot'), fTop = foot ? foot.getBoundingClientRect().top : R.bottom;\n      s.querySelectorAll('*').forEach(e => {\n        if (e.closest('.notes,.foot') || e.matches('.num,.ring,.scrim,.mid,br')) return;\n        const st = getComputedStyle(e); if (st.display === 'none' || st.visibility === 'hidden') return;\n        const q = e.getBoundingClientRect(); if (!q.width || !q.height) return;\n        const name = e.className && typeof e.className === 'string' ? '.' + e.className.split(' ')[0] : e.tagName.toLowerCase();\n        if (q.right > R.right + 1 || q.left \u003c R.left - 1 || q.bottom > R.bottom + 1) o.push('화면 밖: ' + name);\n        else if (st.position !== 'absolute' && !e.closest('.full,.vs,.cover,.thanks,.divider') && q.bottom > fTop - 4 * k) o.push('바닥글과 겹침: ' + name);\n        if (e.scrollWidth > e.clientWidth + 2 && st.overflow !== 'visible') o.push('잘림: ' + name);\n      });\n      const t = s.querySelector('.title'), notes = s.querySelector('.notes');\n      const lines = t ? Math.round(t.getBoundingClientRect().height / k / parseFloat(getComputedStyle(t).lineHeight)) : 0;\n      return { title: s.dataset.title || '', o: [...new Set(o)].slice(0, 6), lines, h: t ? t.textContent.trim() : '', notes: notes ? notes.textContent.trim().length : 0 };\n    });\n    const tag = `${i + 1}장 「${r.title}」`;\n    if (!r.title) warn.push(`${tag} data-title 이 없어요`);\n    if (titles.has(r.title)) warn.push(`${tag} data-title 이 겹쳐요`);\n    titles.add(r.title);\n    if (r.lines > 2) warn.push(`${tag} 제목이 ${r.lines}줄이에요 → 문장을 줄이세요`);\n    if (r.h.length > 36) warn.push(`${tag} 제목이 ${r.h.length}자예요 (30자 안팎 권장)`);\n    if (/^(현황|분석|개요|소개|결과|배경|목차)$/.test(r.h)) warn.push(`${tag} 이름표 제목이에요 → 결론 문장으로`);\n    if (r.notes \u003c 20) warn.push(`${tag} 대본이 없거나 너무 짧아요`);\n    r.o.forEach(x => warn.push(`${tag} ${x}`));\n  }\n  await browser.close();\n  console.log(`${n}장 캡처 → ${out}/`);\n  errors.forEach(e => console.log('오류  ' + e));\n  warn.forEach(w => console.log('주의  ' + w));\n  if (!errors.length && !warn.length) console.log('문제 없음');\n  process.exit(errors.length ? 1 : 0);\n})();\n","scripts/inline_font.py":"#!/usr/bin/env python3\n\"\"\"덱에 쓰인 글자만 담은 Pretendard 를 HTML 안에 넣는다 (인터넷이 없는 교실용).\n\n사용: python3 inline_font.py 덱.html 완성.html [PretendardVariable.ttf 경로]\n준비: pip install fonttools brotli\n글꼴 파일이 없으면 npm 에서 한 번 받는다(약 72MB, ~/.cache/nalssam-html-ppt 에 보관).\nPretendard 는 SIL OFL 1.1 이라 문서에 담아 나눠도 된다.\n\"\"\"\nimport base64, html, io, os, re, subprocess, sys, tarfile, tempfile\n\nCDN = re.compile(r'\u003clink[^>]+pretendard[^>]+>\\s*', re.I)\nMEMBER = 'package/dist/public/variable/PretendardVariable.ttf'\nALWAYS = ' 0123456789.,:;!?%/|()[]\"\\'“”‘’·…—–-+×→←↑↓›‹▦⛶'\n\n\ndef find_font(arg):\n    if arg:\n        return arg\n    cache = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), 'nalssam-html-ppt')\n    path = os.path.join(cache, 'PretendardVariable.ttf')\n    if os.path.exists(path):\n        return path\n    os.makedirs(cache, exist_ok=True)\n    with tempfile.TemporaryDirectory() as tmp:\n        subprocess.run(['npm', 'pack', 'pretendard@1.3.9'], cwd=tmp, check=True, capture_output=True)\n        with tarfile.open(os.path.join(tmp, 'pretendard-1.3.9.tgz')) as tar:\n            with open(path, 'wb') as out:\n                out.write(tar.extractfile(MEMBER).read())\n    return path\n\n\ndef main():\n    if len(sys.argv) \u003c 3:\n        sys.exit(__doc__)\n    src, dst = sys.argv[1], sys.argv[2]\n    from fontTools import subset\n    from fontTools.ttLib import TTFont\n\n    doc = open(src, encoding='utf8').read()\n    body = re.sub(r'\u003c(script|style)\\b.*?\u003c/\\1>', ' ', doc, flags=re.S)\n    text = html.unescape(re.sub(r'\u003c[^>]+>', ' ', body))\n    chars = ''.join(sorted(set(text + ALWAYS) - set('\\n\\r\\t')))\n\n    font = TTFont(find_font(sys.argv[3] if len(sys.argv) > 3 else None))\n    opts = subset.Options()\n    opts.flavor = 'woff2'\n    opts.layout_features = ['*']\n    sub = subset.Subsetter(opts)\n    sub.populate(text=chars)\n    sub.subset(font)\n    buf = io.BytesIO()\n    font.flavor = 'woff2'\n    font.save(buf)\n    b64 = base64.b64encode(buf.getvalue()).decode()\n\n    face = ('\u003cstyle id=\"font-inline\">@font-face{font-family:\"Pretendard Variable\";font-weight:45 920;'\n            'font-style:normal;font-display:swap;src:url(data:font/woff2;base64,%s) format(\"woff2\")}\u003c/style>\\n' % b64)\n    doc = CDN.sub('', doc)\n    doc = re.sub(r'\u003cstyle id=\"font-inline\">.*?\u003c/style>\\s*', '', doc, flags=re.S)\n    doc = doc.replace('\u003cstyle>', face + '\u003cstyle>', 1)\n    open(dst, 'w', encoding='utf8').write(doc)\n    print('%s  글자 %d개 · 글꼴 %dKB · 전체 %dKB' % (dst, len(chars), len(buf.getvalue()) // 1024, len(doc.encode()) // 1024))\n\n\nif __name__ == '__main__':\n    main()\n","references/design-rules.md":"# 장을 짤 때 지키는 기준\n\n장을 만들기 전에 읽고, 점검할 때 다시 본다. 용어와 기준은 Design in words(designinwords.onpod.ai)의 슬라이드용 용어를 날쌤 덱에 맞게 다시 정리한 것이다. 괄호 안은 그 사이트가 밝힌 근거다.\n\n## 구성\n\n| 기준 | 값 | 어기면 |\n|---|---|---|\n| 한 장 한 메시지 | 제목 = 결론 한 문장, 근거는 숫자 하나 + 그림 하나 | 결론이 셋이면 세 장으로 나눈다 |\n| 초점 | 한 장에 하나. 가장 크게, 키컬러로, 둘레를 비운다 | 강조가 셋을 넘으면 아무것도 강조되지 않는다 |\n| 위계 | 크기 → 굵기 → 여백 → 색 순서로 만든다 | 색부터 바꾸면 알록달록해지기만 한다 |\n| 정렬 | 한 장에 시작선 하나. 긴 글은 왼쪽, 가운데 정렬은 짧은 제목에만 | 시작선이 둘이면 시선이 끊긴다 |\n| 근접성 | 묶음 사이 간격 = 묶음 안 간격의 3배 | 상자부터 그리면 간격 차이가 묻힌다 |\n| 시선 흐름 | 글이 적은 장은 Z자: 왼쪽 위에서 시작해 오른쪽 아래에서 끝난다 | 핵심어를 줄 끝에 두면 읽히지 않는다 |\n\n## 글자와 간격\n\n| 기준 | 값 |\n|---|---|\n| 간격 | 8의 배수만. 글줄 사이 16, 묶음 사이 32, 바깥 여백 48 이상. 단계는 5~7개 |\n| 타입 스케일 | 본문에서 제목까지 1.2~1.5배씩. 1.1 이하는 차이가 안 보인다 |\n| 행간 | 한글 본문 1.5~1.6. 1.3 이하면 줄을 놓친다 (WCAG 1.4.12) |\n| 자간 | 큰 제목만 −2% 안팎. 본문은 건드리지 않고, 한글 라벨에 0.1em 넘는 자간은 쓰지 않는다 |\n| 대비 | 본문 4.5:1 이상, 큰 글자(약 24px 이상) 3:1 이상 (WCAG 1.4.3) |\n| 라운드 | 한 덱에 둥글기 값은 세 가지까지. 안쪽 요소는 바깥보다 덜 둥글게 |\n\n## 색\n\n- **키컬러 하나**: 키커·번호·강조 막대·민트 띠에만 쓴다. 제목과 배경까지 칠하면 강조가 사라진다.\n- **60-30-10**: 바탕 60, 보조 30, 강조 10. 숫자를 맞추기보다 강조색을 아주 조금만 쓴다(경험칙).\n- **포인트 색(코랄)**: 마지막 칸, 원칙 한 줄처럼 한 장에 한 곳.\n- **그라데이션**: 이유 없는 보라·분홍 그라데이션은 쓰지 않는다. 쓴다면 한 색 안에서 밝기만.\n- **색만으로 뜻을 전하지 않는다**: 차트 값은 숫자로도 적고, 짚은 곳은 테두리와 글로도 알린다.\n\n## 그림과 차트\n\n| 상황 | 방법 | 피할 것 |\n|---|---|---|\n| 순위·비교 | 큰 순서로 정렬한 가로 막대, 말할 막대 하나만 키컬러 | 조각 5개 넘는 원그래프, 막대마다 다른 색 |\n| 숫자 여러 개 | 셋만 골라 큰 숫자 + 한 줄 설명 | 숫자 열 개를 모두 그림으로 |\n| 화면 캡처 | 한 곳만 테두리로 짚고 나머지는 어둡게, 옆에 한 줄 | 한 장에 콜아웃 4개 이상, 설명 없는 빨간 동그라미 |\n| 사진 위 글자 | 글자 쪽에만 아래에서 위로 옅어지는 어두운 스크림 | 사진 전체를 어둡게, 글자 그림자만 진하게 |\n| 사진 + 글 | 1:2 로 나누고 주인공 쪽을 넓게 | 반반 분할 |\n| 전면 사진 | 선명하고 큰 사진만 | 작은 사진을 늘려 깨지게 |\n| 아이콘 | 한 덱에 한 세트. 같은 굵기·같은 색 | 선 아이콘과 면 아이콘 섞기 |\n\n## 점검할 때 묻는 것\n\n1. 1초만 보고 눈을 돌렸을 때 기억나는 것이 하나인가.\n2. 제목만 이어 읽어도 발표의 줄거리가 되는가.\n3. 내용을 빼기 전에 여백부터 늘려 보았는가.\n4. 이 장의 포인트 색은 한 곳뿐인가.\n5. 숫자와 인용에 출처가 있는가, 예시에 `(가상)` 이 붙었는가.\n","references/motion.md":"# 움직임 값과 근거\n\n엔진에 들어 있는 움직임이 왜 이 값인지 적어 둔다. 새 움직임을 더할 때도 이 표 안에서 고른다.\n\n## 한도\n\n| 무엇 | 값 | 근거 |\n|---|---|---|\n| 장 전환 | 0.3초, 페이드 하나. 0.5초를 넘기지 않는다 | 전환은 내용이 아니라 이음새다. 길면 기다리게 된다 |\n| 차례 등장 간격 | 60ms. 전체가 0.8초 안에 끝나게 | 50~100ms 가 자연스럽고 300ms 를 넘으면 기다린다 |\n| 글자 등장 | 글자당 45ms, 1초 안. 글자가 많으면 간격을 줄인다 | 다 나타나기 전엔 읽을 수 없다 |\n| 숫자 올라가기 | 0.9초, 빠르게 출발해 천천히 멈춤 | |\n| 반복 움직임 | 넣지 않는다 | 5초 넘게 움직이면 멈출 수 있어야 한다 (WCAG 2.2.2) |\n| 깜빡임 | 넣지 않는다 | 1초에 3번 넘게 번쩍이지 않는다 (WCAG 2.3.1) |\n| 움직임 줄이기 | 설정이 켜지면 모두 1ms 로 | WCAG 2.3.3 |\n\n## 이징\n\nRemotion Scenes(lifeprompt-team/remotion-scenes, MIT)의 공통 이징 값을 CSS 로 옮겼다.\n\n| 변수 | 값 | 쓰임 |\n|---|---|---|\n| `--out` | `cubic-bezier(.16,1,.3,1)` | 기본. 등장·막대·선 |\n| `--smooth` | `cubic-bezier(.4,0,.2,1)` | 페이드 전환 |\n| `--over` | `cubic-bezier(.34,1.56,.64,1)` | `data-fx=\"pop\"` 처럼 살짝 지나쳤다 돌아오는 것 |\n\n쓰지 않고 남겨 둔 값(필요할 때만): 극적인 등장 `cubic-bezier(.6,.01,.05,.95)`, 딱 멈춤 `cubic-bezier(.075,.82,.165,1)`.\n\n## 전환 네 가지\n\n모두 `clip-path` 와 `opacity` 만 쓴다. 지난 장을 아래에 깔고 새 장이 위에서 드러난다.\n\n| `data-tr` | 모양 | 쓸 곳 |\n|---|---|---|\n| (없음) | 페이드 | 본문 모든 장 |\n| `wipe` | 왼쪽에서 닦아내기 | 간지 |\n| `circle` | 가운데에서 원으로 퍼지기 | 실습·활동 시작 |\n| `slice` | 사선으로 자르기 | 전·후 대비 |\n\n한 덱에서 본문은 페이드 하나로 통일하고, 간지에 쓰는 전환도 한 가지로 맞춘다.\n\n## 영상용 레이아웃에서 가져온 구도\n\nRemotion Scenes 의 Layout·List 장면에서 발표 화면에 맞는 것만 옮겼다.\n\n- **큰 글자와 작은 라벨의 대비**: 간지의 번호는 화면 밖으로 나갈 만큼 크고 옅게, 라벨은 작고 자간을 넓게.\n- **강조색은 단어 하나에만**: 제목 두 줄 가운데 한 단어.\n- **늦게 자라는 선**: 제목이 나온 뒤 4~6px 선이 따라 자란다(`.grow`).\n- **주인공 먼저**: 큰 숫자·제목이 먼저, 보조 설명은 다음 단계에.\n- **첫 줄만 진하게**: 번호 목록의 첫 번호만 키컬러, 나머지는 옅게.\n\n영상용 값을 그대로 쓰지 않은 것: 목록 항목 간격 0.5초(영상은 혼자 흘러가지만 발표는 사람이 넘긴다 → 60ms 로 줄임), 흔들리며 춤추는 글자, 글리치·네온·입자 효과(읽기를 방해한다).\n","references/brand-themes.md":"# 다른 브랜드 톤을 입히는 법\n\n기본은 날쌤 테마다. 사용자가 \"토스 느낌으로\", \"당근 톤으로\"처럼 한국 서비스의 디자인 톤을 원할 때만 이 문서를 따른다.\n\n## 어디서 가져오나\n\nko/design.md 카탈로그(getdesign.kr)가 한국 브랜드의 색·글꼴·간격·라운드·그림자·규칙을 브랜드당 `DESIGN.md` 한 장으로 공개한다. 기억으로 흉내 내지 말고 그 문서를 받아서 쓴다.\n\n```bash\ncurl -fsSL --create-dirs -o ~/.cache/use-design-md/index.txt https://www.getdesign.kr/llms.txt\ncurl -fsSL --create-dirs -o ~/.cache/use-design-md/\u003cslug>.md https://www.getdesign.kr/services/\u003cslug>/llms.txt\n```\n\n- 색인에서 브랜드 이름·디자인 시스템 이름·슬러그를 모두 대조한다(당근 → `seed-design`, 구름 → `vapor-ui`).\n- 카탈로그에 없는 브랜드는 없다고 알린다. 비슷한 색을 지어내지 않는다.\n- 받은 파일은 끝까지 읽는다. 뒤쪽에 `Do's and Don'ts` 와 `Known Gaps` 가 있다.\n- `use-design-md` 스킬이 설치돼 있으면 그 절차를 따른다(`npx skills add CaesiumY/ko-design-md`).\n\n## 덱에 옮기는 법\n\n값은 `starter.html` 맨 위 토큰에서만 바꾼다. 장 안에 색을 직접 적지 않는다.\n\n| DESIGN.md | 덱 토큰 |\n|---|---|\n| 바탕·표면 색 | `--bg` · `--card` · `--paper` · `--zebra` |\n| 글자 색(본문 / 보조) | `--ink` / `--sub` |\n| 브랜드 대표 색 | `--key`, 아주 연한 단계는 `--key-soft` |\n| 보조 강조 색(있을 때만) | `--point`. 없으면 `--key` 와 같은 값으로 둔다 |\n| 테두리 색 | `--line` |\n| 라운드 단계 | `--r` |\n| 글꼴 | `--sans`. 다시 나눠 줄 수 없는 글꼴이면 문서가 정한 대체 글꼴을 쓴다 |\n\n새 테마는 `[data-theme=\"이름\"]{…}` 블록 하나로 더한다. 이름은 브랜드명이 아니라 쓰임새로 짓는다(`blue`, `warm` 처럼).\n\n## 꼭 지킬 것\n\n1. **Known Gaps 를 먼저 읽는다.** 대비가 낮다고 적힌 색 조합은 본문에 쓰지 않는다. 문서에 없는 값을 채웠으면 \"제가 고른 값\"이라고 알린다.\n2. **Do's and Don'ts 는 그대로 따른다.** \"카드에 그림자를 넣지 않는다\", \"한 화면에 강조색은 하나\" 같은 규칙이다.\n3. **브랜드 이름을 덱에 넣지 않는다.** 제목·바닥글·클래스 이름·토큰 이름에 브랜드명, 디자인 시스템 이름, 그쪽 토큰 접두사를 쓰지 않는다. 로고·서비스 고유 문구도 쓰지 않는다. 빌리는 것은 겉모습의 규칙뿐이다.\n4. **날쌤 덱의 구조는 그대로 둔다.** 결론 제목, 한 장 한 메시지, 대본, 바닥글은 바꾸지 않는다. 바뀌는 것은 색·둥글기·글꼴이다.\n5. **눈으로 확인한다.** 바꾼 뒤 `check.js` 로 전체를 캡처해 대비와 강조색 넓이를 본다.\n\n색 값은 카탈로그가 OKLCH 로 적는다. CSS 에 `oklch()` 를 그대로 써도 된다.\n"},"presets":{"source":"ko/design.md (getdesign.kr) · CC BY 4.0","brands":[{"slug":"laftel","name":"라프텔","cat":"content","key":"#816BFF","src":"hex","via":"point","radii":[3,4,8,16],"url":"https://www.getdesign.kr/services/laftel"},{"slug":"chzzk","name":"치지직","cat":"content","key":"#1BB373","src":"hex","via":"brand-strongest","radii":[2,4,6,8,12,16,20,24],"url":"https://www.getdesign.kr/services/chzzk"},{"slug":"banksalad","name":"뱅크샐러드","cat":"finance","key":"#06A96C","src":"hex","via":"green-normal","radii":[6,8,12,16,20,24],"url":"https://www.getdesign.kr/services/banksalad"},{"slug":"ridi","name":"리디","cat":"content","key":"#1E9EFF","src":"hex","via":"primary","radii":[2,4],"url":"https://www.getdesign.kr/services/ridi"},{"slug":"nol","name":"NOL","cat":"travel","key":"#3549FF","src":"hex","via":"primary","radii":[4,6,8,10,12,16,20,24,28],"url":"https://www.getdesign.kr/services/nol"},{"slug":"lg-electronics","name":"LG전자","cat":"etc","key":"#FD312E","src":"hex","via":"active-red","radii":[4,6,8,10,12,14,16,18,20,24,28],"url":"https://www.getdesign.kr/services/lg-electronics"},{"slug":"zigbang","name":"직방","cat":"etc","key":"#FF6905","src":"hex","via":"orange1","radii":[],"url":"https://www.getdesign.kr/services/zigbang"},{"slug":"remember","name":"리멤버","cat":"career","key":"#000000","src":"hex","via":"primary","radii":[2,4,6,8,10],"url":"https://www.getdesign.kr/services/remember"},{"slug":"gs-shop","name":"GS SHOP","cat":"commerce","key":"#0F78FF","src":"hex","via":"primary","radii":[4,6,8,12,16,20],"url":"https://www.getdesign.kr/services/gs-shop"},{"slug":"likelion","name":"멋쟁이사자처럼","cat":"education","key":"#FF6000","src":"hex","via":"primary","radii":[2,4,8,12,16,20,24],"url":"https://www.getdesign.kr/services/likelion"},{"slug":"gs-retail","name":"우리동네GS","cat":"commerce","key":"#00D4EA","src":"hex","via":"signature-cyan","radii":[],"url":"https://www.getdesign.kr/services/gs-retail"},{"slug":"samsung-one-ui","name":"삼성 One UI","cat":"developer","key":"#0381FE","src":"hex","via":"primary","radii":[12,18,20,26],"url":"https://www.getdesign.kr/services/samsung-one-ui"},{"slug":"greeting","name":"그리팅","cat":"career","key":"#1890FF","src":"hex","via":"primary","radii":[4,6,8,10,14,20],"url":"https://www.getdesign.kr/services/greeting"},{"slug":"yeogi","name":"여기어때","cat":"travel","key":"#F7323F","src":"hex","via":"primary","radii":[2,3,4,8,10,12,16,20],"url":"https://www.getdesign.kr/services/yeogi"},{"slug":"codeit","name":"코드잇","cat":"education","key":"#6500C3","src":"hex","via":"primary","radii":[2,4,6,8,10,12,16,20,24,28],"url":"https://www.getdesign.kr/services/codeit"},{"slug":"class101","name":"클래스101","cat":"education","key":"#FF5D00","src":"hex","via":"primary","radii":[4,8,12,16,20],"url":"https://www.getdesign.kr/services/class101"},{"slug":"bezier","name":"채널톡","cat":"developer","key":"#6157EA","src":"oklch","via":"blue-400","radii":[2,3,4,6,8,12,16,20],"url":"https://www.getdesign.kr/services/bezier"},{"slug":"kyobobook","name":"교보문고","cat":"commerce","key":"#5055B1","src":"hex","via":"primary","radii":[4,8,12,16,20,24],"url":"https://www.getdesign.kr/services/kyobobook"},{"slug":"11st","name":"11번가","cat":"commerce","key":"#FF0038","src":"hex","via":"primary","radii":[2,4,8,12,16],"url":"https://www.getdesign.kr/services/11st"},{"slug":"line-design-system","name":"라인","cat":"messenger","key":"#06C755","src":"hex","via":"primary","radii":[2,3,5,7,12],"url":"https://www.getdesign.kr/services/line-design-system"},{"slug":"gmarket","name":"지마켓","cat":"commerce","key":"#00C400","src":"hex","via":"green-500","radii":[2,4,8,12,16],"url":"https://www.getdesign.kr/services/gmarket"},{"slug":"socar","name":"쏘카","cat":"mobility","key":"#0078FF","src":"hex","via":"primary","radii":[4,6,8,10,12,14,16,20,24],"url":"https://www.getdesign.kr/services/socar"},{"slug":"baemin","name":"배달의민족","cat":"delivery","key":"#0CEFD3","src":"hex","via":"primary","radii":[4,8,12,16,20],"url":"https://www.getdesign.kr/services/baemin"},{"slug":"seed-design","name":"당근","cat":"community","key":"#FF6600","src":"hex","via":"carrot-600","radii":[2,4,6,8,10,12,14,16,20,24],"url":"https://www.getdesign.kr/services/seed-design"},{"slug":"teamsparta","name":"팀스파르타","cat":"education","key":"#FA0030","src":"hex","via":"primary","radii":[6,16],"url":"https://www.getdesign.kr/services/teamsparta"},{"slug":"wanted","name":"원티드","cat":"career","key":"#0066FF","src":"hex","via":"primary","radii":[2,4,8,12,16,20,24],"url":"https://www.getdesign.kr/services/wanted"},{"slug":"toss","name":"토스","cat":"finance","key":"#3182F6","src":"hex","via":"primary","radii":[4,8,12,14,16,20,24],"url":"https://www.getdesign.kr/services/toss"},{"slug":"vapor-ui","name":"구름","cat":"developer","key":"#2A72E5","src":"hex","via":"primary","radii":[2,4,6,8,12,16,20,24],"url":"https://www.getdesign.kr/services/vapor-ui"},{"slug":"krds","name":"KRDS","cat":"gov","key":"#256EF4","src":"hex","via":"primary","radii":[4,6,8,10,12],"url":"https://www.getdesign.kr/services/krds"}]}}, ARTIFACT=false;
+  var $=function(id){return document.getElementById(id)};
+  var LABEL={
+    ground:{warm:'웜 오프화이트',white:'흰색',chalk:'칠판',navy:'네이비'},
+    radius:{'0':'각지게 0','8':'살짝 8','12':'보통 12','20':'둥글게 20'},
+    card:{line:'얇은 테두리',shadow:'옅은 그림자',fill:'옅은 면'},
+    pattern:{none:'없음',grid:'격자',dots:'점'},
+    titlefx:{none:'없음',bar:'짧은 밑줄',marker:'형광펜'},
+    motion:{basic:'기본',calm:'차분하게',off:'끔'},
+    tone:{haeyo:'~해요',hamnida:'~합니다'},
+    script:{live:'라이브 요점형',read:'녹화 낭독형'}
+  };
+  var PRESETS={
+    nalssam:{ko:'날쌤 기본',ground:'warm',key:'#18766B',point:'#D9734E',radius:'12'},
+    chalk:{ko:'칠판',ground:'chalk',key:'#9FE0CB',point:'#F6C177',radius:'12'},
+    navy:{ko:'네이비',ground:'navy',key:'#7FD1C1',point:'#F0957A',radius:'12'}
+  };
+  var cfg=C.normalize({});
+  try{var saved=localStorage.getItem('ppt-skill-cfg');if(saved)cfg=C.parseLine(saved)}catch(e){}
+
+  function radios(host,name,items,dot){
+    host.innerHTML='';
+    items.forEach(function(it){
+      var l=document.createElement('label');l.className='pick';
+      var i=document.createElement('input');i.type='radio';i.name=name;i.value=it[0];i.id=name+'-'+it[0];
+      var s=document.createElement('span');
+      if(it[2]){var d=document.createElement('i');d.style.background=it[2];s.appendChild(d)}
+      s.appendChild(document.createTextNode(it[1]));l.appendChild(i);l.appendChild(s);host.appendChild(l);
+    });
+  }
+  radios($('o-preset'),'preset',Object.keys(PRESETS).map(function(k){return [k,PRESETS[k].ko,PRESETS[k].key]}));
+  radios($('o-brand'),'brand',DATA.presets.brands.map(function(b){return [b.slug,b.name,b.key]}));
+  $('n-brand').textContent=DATA.presets.brands.length;
+  ['ground','radius','card','pattern','titlefx','motion','tone','script'].forEach(function(k){
+    radios($('o-'+k),k,C.CHOICES[k].map(function(v){return [v,LABEL[k][v],k==='ground'?C.GROUNDS[v].bg:null]}));
+  });
+  radios($('o-font'),'font',Object.keys(C.FONTS).map(function(k){return [k,C.FONTS[k].ko]}));
+  radios($('o-titleFont'),'titleFont',Object.keys(C.TITLE_FONTS).map(function(k){return [k,C.TITLE_FONTS[k].ko]}));
+
+  /* ── 견본: 스타터의 CSS 와 장을 그대로 가져와 섀도 DOM 에 그린다 ── */
+  var starter=DATA.files['assets/starter.html'];
+  var css=(starter.match(/<style>([\s\S]*?)<\/style>/)||[])[1]||'';
+  var stageHtml=starter.slice(starter.indexOf('<div id="stage"'),starter.indexOf('<div id="hud">'));
+  var host=$('pvhost'),sh=host.attachShadow({mode:'open'});
+  sh.innerHTML='<style>'+css.replace(/:root/g,':host').replace(/html,body\{[^}]*\}/,'')+
+    '#stage{position:absolute!important;left:0!important;top:0!important}.slide{animation:none!important}#bar{display:none}</style><style id="th"></style>'+stageHtml;
+  var stage=sh.getElementById('stage'),slides=[].slice.call(sh.querySelectorAll('.slide'));
+  slides.forEach(function(s,i){
+    [].forEach.call(s.querySelectorAll('[data-step]'),function(e){e.classList.add('shown')});
+    [].forEach.call(s.querySelectorAll('[data-count]'),function(e){var v=+e.dataset.count;e.textContent=e.dataset.dec?v.toFixed(+e.dataset.dec):v.toLocaleString('ko-KR')});
+    if(!s.hasAttribute('data-nofoot')&&!s.classList.contains('cover')){var f=document.createElement('div');f.className='foot';f.innerHTML='<span></span><b></b>';s.appendChild(f)}
+  });
+  var SHOW=[['표지',0],['카드',1],['간지',2],['메시지',3],['차트',4],['숫자',5],['목록',7],['표',9],['단계',10],['인용',11]],cur=0;
+  SHOW.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.textContent=t[0];b.onclick=function(){cur=i;draw()};$('tabs').appendChild(b)});
+  function fit(){var k=host.clientWidth/1600;stage.style.transform='scale('+k+')';stage.style.transformOrigin='0 0'}
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(host);addEventListener('resize',fit);
+
+  var loaded={};
+  function fonts(){C.fontInfo(cfg).links.forEach(function(h){if(loaded[h])return;loaded[h]=1;var l=document.createElement('link');l.rel='stylesheet';l.href=h;document.head.appendChild(l)})}
+
+  function brandOf(slug){return DATA.presets.brands.filter(function(b){return b.slug===slug})[0]||null}
+  function draw(){
+    cfg=C.normalize(cfg);fonts();
+    sh.getElementById('th').textContent=C.themeCss(cfg).replace(/:root/g,':host');
+    var a=C.stageAttrs(cfg);Object.keys(a).forEach(function(k){stage.setAttribute('data-'+k,a[k])});
+    slides.forEach(function(s,i){s.classList.toggle('on',i===SHOW[cur][1]);var f=s.querySelector('.foot');
+      if(f){f.firstChild.textContent=[cfg.title+' 견본',cfg.author,'2026. 11. 21.(토)'].filter(Boolean).join('  |  ');f.lastChild.textContent=('0'+(i+1)).slice(-2)+' / '+slides.length}});
+    var who=sh.querySelector('.thanks .who');if(who)who.textContent=cfg.author||'발표자 이름';
+    [].forEach.call($('tabs').children,function(b,i){b.setAttribute('aria-pressed',i===cur)});
+    fit();
+    // 폼 값 맞추기
+    ['preset','brand','ground','font','titleFont','radius','card','pattern','titlefx','motion','tone','script'].forEach(function(k){
+      [].forEach.call(document.querySelectorAll('input[name="'+k+'"]'),function(i){i.checked=(i.value===cfg[k])})});
+    ['key','point'].forEach(function(k){$(k+'-c').value=cfg[k];if(document.activeElement!==$(k+'-t'))$(k+'-t').value=cfg[k]});
+    ['title','name','author'].forEach(function(k){if(document.activeElement!==$(k))$(k).value=cfg[k]});
+    var t=C.tokens(cfg),n=$('key-note');
+    n.hidden=!t.keyMoved;if(t.keyMoved)n.textContent='고른 색 '+cfg.key+' 은 이 바탕에서 글자로 읽기 어려워 '+t.key+' 로 진하기를 맞췄습니다(본문 대비 4.5:1).';
+    var line=C.toLine(cfg);$('line').textContent=line;
+    [].forEach.call(document.querySelectorAll('.sk-name'),function(e){e.textContent=cfg.name});
+    [].forEach.call(document.querySelectorAll('.sk-title'),function(e){e.textContent=cfg.title});
+    try{localStorage.setItem('ppt-skill-cfg',line)}catch(e){}
+  }
+  $('f').addEventListener('change',function(e){
+    var t=e.target;if(t.type!=='radio')return;
+    if(t.name==='preset'){var p=PRESETS[t.value];cfg.preset=t.value;cfg.brand='';cfg.ground=p.ground;cfg.key=p.key;cfg.point=p.point;cfg.radius=p.radius}
+    else if(t.name==='brand'){var b=brandOf(t.value);cfg.preset='brand';cfg.brand=b.slug;cfg.ground='white';cfg.key=b.key;cfg.point=b.key;
+      var r=b.radii.length?b.radii.reduce(function(x,y){return Math.abs(y-12)<Math.abs(x-12)?y:x}):12;
+      cfg.radius=String(['0','8','12','20'].reduce(function(x,y){return Math.abs(y-r)<Math.abs(x-r)?y:x}));}
+    else cfg[t.name]=t.value;
+    draw();
+  });
+  ['key','point'].forEach(function(k){
+    $(k+'-c').addEventListener('input',function(){cfg[k]=this.value;draw()});
+    $(k+'-t').addEventListener('input',function(){var v=this.value.trim();if(v&&v.charAt(0)!=='#')v='#'+v;if(/^#[0-9a-fA-F]{6}$/.test(v)){cfg[k]=v;draw()}});
+  });
+  $('title').addEventListener('input',function(){cfg.title=this.value;draw()});
+  $('author').addEventListener('input',function(){cfg.author=this.value;draw()});
+  $('name').addEventListener('input',function(){var v=this.value.trim(),er=C.nameError(v),box=$('name-err');box.hidden=!er;box.textContent=er;if(!er){cfg.name=v;draw()}});
+  $('name').addEventListener('blur',function(){this.value=cfg.name;$('name-err').hidden=true});
+
+  $('copy').addEventListener('click',function(){
+    var text=$('line').textContent,ok=$('copied');
+    function done(){ok.hidden=false;setTimeout(function(){ok.hidden=true},2500)}
+    function select(){var r=document.createRange();r.selectNodeContents($('line'));var s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent='복사가 막혀 글자를 선택해 두었습니다. Ctrl+C 를 누르세요';done()}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){ok.textContent='복사했습니다';done()},select);else select();
+  });
+  var dl=$('dl');
+  if(dl)dl.addEventListener('click',function(){
+    var out=C.buildSkill(cfg,DATA.files,brandOf(cfg.brand)),bytes=C.zip(out,cfg.name);
+    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));a.download=cfg.name+'.zip';document.body.appendChild(a);a.click();a.remove();
+    $('saved').hidden=false;$('saved').textContent=cfg.name+'.zip 을 저장했습니다';
+  });
+  draw();
+})();
+</script>
+
+</body>
+</html>

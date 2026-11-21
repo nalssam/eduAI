@@ -1,6 +1,6 @@
 ---
 name: nalssam-html-ppt
-description: "날쌤(nalssam) 스타일의 HTML 발표 덱을 만든다 — 웜 오프화이트·네이비·틸·코랄, Pretendard, 결론 문장 제목, 장마다 대본. 브라우저로 여는 파일 하나에 키보드 넘기기·단계 등장·숫자 올라가기·목록·대본 창·PDF 저장이 들어 있다. 트리거: 날쌤 HTML PPT, nalssam html ppt, HTML 덱, 웹 슬라이드, 링크로 여는 발표 자료, 분필팩 HTML PPT."
+description: "날쌤(nalssam) 스타일 HTML 발표 덱을 파일 하나로 만든다. 결론 문장 제목, 장마다 대본, 넘기기·단계 등장·PDF 저장. '[HTML PPT 스킬 설정]' 한 줄을 받으면 나만의 스킬로 저장한다. 트리거: 날쌤 HTML PPT, HTML 덱, 웹 슬라이드, 나만의 PPT 스킬."
 ---
 
 # nalssam-html-ppt · 날쌤 스타일 HTML PPT
@@ -133,11 +133,27 @@ node scripts/check.js 덱.html shots-m --mobile # 휴대폰 세로 화면
 4. 차트 막대는 `--v`(가장 큰 값을 100 으로 본 비율)로 길이를 정한다. 값 자체는 막대 끝 숫자로 적는다.
 5. 이 엔진에는 실시간 투표·채팅·타이머·음악이 없다. 그런 참여 기능이 필요한 연수는 그 기능이 들어 있는 다른 덱 엔진을 쓴다.
 
-## 10. 참고 파일
+## 10. 나만의 스킬로 저장하기
+
+사용자가 `[HTML PPT 스킬 설정] name=…; key=#…; …` 한 줄을 붙여 넣거나 "내 스타일로 스킬 만들어 줘"라고 하면 덱이 아니라 **새 스킬**을 만든다.
+
+1. 설정 한 줄이 없으면 고르기 판(저장소 `site/index.html`, 배포했다면 그 주소)에서 고른 뒤 마지막 화면의 한 줄을 붙여 넣어 달라고 한다. 판을 못 쓰면 이름·바탕·포인트 색·글꼴만 묻고 나머지는 기본값으로 둔다.
+2. `node scripts/make_skill.js "<받은 한 줄>" <출력 폴더>` → `<이름>/` 폴더와 `<이름>.zip` 이 나온다. 포인트 색이 바탕에서 읽기 어려우면 스크립트가 진하게 맞추고 알려 준다. 그 말을 사용자에게 그대로 전한다.
+3. `node <이름>/scripts/check.js <이름>/assets/starter.html shots` 로 견본을 캡처해 눈으로 본다.
+4. ZIP 을 사용자에게 건네고 붙이는 법을 알린다.
+   - **Claude 앱**: 설정 > 기능에서 "코드 실행 및 파일 생성"을 켠다 → 사용자 지정 > 스킬 > + > 스킬 만들기 > "스킬 업로드"에 ZIP 을 올린다.
+   - **Claude Code**: ZIP 을 풀어 `~/.claude/skills/<이름>/` 에 둔다(프로젝트만 쓰려면 `.claude/skills/<이름>/`).
+   - **Codex**: ZIP 을 풀어 `~/.agents/skills/<이름>/` 에 둔다(저장소만 쓰려면 `.agents/skills/<이름>/`). `$<이름>` 으로 부른다.
+5. 이름 규칙: 영어 소문자·숫자·하이픈, 64자 이하, `claude`·`anthropic` 은 넣을 수 없다. 설명(description)은 200자를 넘기지 않는다.
+6. 브랜드 톤(`brand=<slug>`)을 골랐으면 만들어진 스킬이 처음 쓰일 때 `references/brand-themes.md` 대로 그 브랜드의 DESIGN.md 를 받아 Do/Don't 를 확인하게 돼 있다. 고르기 판이 넣는 값은 대표색과 둥글기뿐이고, 나머지 바탕·글자색은 이 도구가 맞춘 값이다.
+
+## 11. 참고 파일
 
 - `assets/starter.html` — 엔진 + 견본 18장. 원본은 고치지 않고 복사해서 쓴다.
 - `scripts/check.js` — 캡처와 넘침·대본·제목 검사(Playwright).
 - `scripts/inline_font.py` — 쓰인 글자만 담은 Pretendard 를 파일 안에 넣는다.
 - `references/design-rules.md` — 장을 짤 때 지키는 수치 기준과 피할 것.
 - `references/motion.md` — 이징·전환·시차 값과 그 근거.
+- `scripts/make_skill.js` · `scripts/lib/core.js` — 설정 한 줄로 나만의 스킬을 찍는다.
+- `assets/SKILL.template.md` · `assets/presets.json` — 새 스킬의 문서 틀과 한국 서비스 대표색 목록.
 - `references/brand-themes.md` — 다른 브랜드 톤을 입히는 법.

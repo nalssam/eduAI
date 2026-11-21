@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>날쌤 HTML PPT 스타터</title>
+<!--FONT-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!--/FONT-->
 <style>
 /* ═════════ 1. 토큰 — 색·글꼴·간격은 여기서만 바꾼다 ═════════ */
 :root,[data-theme="nalssam"]{
@@ -257,12 +259,25 @@ body.move #hud{opacity:1}
   .grow,.bars .b{transform:none!important}
   #hud,#np,#ov,#help,#lb,#bar{display:none!important}
 }
+
+/* ═════════ 6. 꾸미기 옵션 — #stage 의 data-* 로 켠다 ═════════ */
+.title,.cover h1,.divider h2,.thanks h2,.full .cap{font-family:var(--title-font,var(--sans));font-weight:var(--title-weight,800)}
+[data-card="shadow"] .card{border-color:transparent;box-shadow:0 10px 28px rgba(19,44,61,.09)}
+[data-card="fill"] .card{border-color:transparent;background:var(--paper)}
+[data-pattern="grid"] .slide:not(.full):not(.vs){background-image:linear-gradient(color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--line) 55%,transparent) 1px,transparent 1px);background-size:40px 40px}
+[data-pattern="dots"] .slide:not(.full):not(.vs){background-image:radial-gradient(color-mix(in srgb,var(--key) 24%,transparent) 1.6px,transparent 2px);background-size:32px 32px}
+[data-titlefx="bar"] .title::after{content:"";display:block;width:88px;height:6px;border-radius:3px;background:var(--key);margin-top:var(--s2)}
+[data-titlefx="marker"] .title{text-decoration:underline;text-decoration-color:var(--key-soft);text-decoration-thickness:.34em;text-underline-offset:-.14em;text-decoration-skip-ink:none}
+[data-titlefx="marker"] .lead{margin-top:var(--s3)}
+[data-motion="calm"] [data-step],[data-motion="calm"] .stag>*,[data-motion="calm"] .kin span{transform:none}
+[data-motion="off"] *,[data-motion="off"] *::before,[data-motion="off"] *::after{transition-duration:1ms!important;transition-delay:0s!important;animation-duration:1ms!important}
 </style>
+<style id="my-theme">/*MY-THEME*/</style>
 </head>
 <body>
 
 <!-- 덱 정보: 바닥글이 여기서 만들어진다. data-theme 은 nalssam(기본) · chalk · navy -->
-<div id="stage" data-theme="nalssam" data-event="날쌤 HTML PPT 견본" data-author="nalssam 박준호" data-date="2026. 11. 21.(토)">
+<div id="stage" data-theme="nalssam" data-card="line" data-pattern="none" data-titlefx="none" data-motion="basic" data-event="날쌤 HTML PPT 견본" data-author="nalssam 박준호" data-date="2026. 11. 21.(토)">
 
 <!-- 01 표지 -->
 <section class="slide cover" data-title="표지">
