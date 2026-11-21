@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// 고르기 판을 만든다: site/index.html(웹사이트용, ZIP 바로 받기) · site/artifact.html(Claude 아티팩트용)
-//                    site/downloads/nalssam-html-ppt.zip(기본 스킬 설치 파일)
+// 사이트를 만든다.
+//   site/index.html            분필팩 첫 화면(한 줄 설치 + 스킬 ZIP)      site/pack-artifact.html   같은 화면의 아티팩트용
+//   site/builder.html          스타일 고르기 판                           site/artifact.html        고르기 판의 아티팩트용
+//   site/downloads/<스킬>.zip  스킬별 ZIP · bunpil-skill-pack.zip(전체)
 // 사용: node tools/build_site.js
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..'), skill = path.join(root, 'skills/nalssam-html-ppt');
@@ -45,26 +47,62 @@ const variants = {
       ` + lineBox.replace('__LINE_HINT__', '이 한 줄을 복사해 Claude 대화창에 붙여 넣고 "이 설정으로 스킬 저장해 줘"라고 합니다. Claude 가 스킬 ZIP 을 만들어 줍니다.').replace('__COPY_CLASS__', 'ghost'),
   },
 };
-// 기본 스킬 설치 파일
-const base = {};
-(function walk(dir, rel) {
-  fs.readdirSync(dir, { withFileTypes: true }).forEach(e => {
-    const p = path.join(dir, e.name), r = rel ? rel + '/' + e.name : e.name;
-    if (e.isDirectory()) walk(p, r); else base[r] = new Uint8Array(fs.readFileSync(p));
-  });
-})(skill, '');
+// 스킬별 ZIP 과 팩 전체 ZIP
+function tree(dir) {
+  const out = {};
+  (function walk(d, rel) {
+    fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const p = path.join(d, e.name), r = rel ? rel + '/' + e.name : e.name;
+      if (e.isDirectory()) walk(p, r); else out[r] = new Uint8Array(fs.readFileSync(p));
+    });
+  })(dir, '');
+  return out;
+}
 fs.mkdirSync(path.join(root, 'site/downloads'), { recursive: true });
-const baseZip = Buffer.from(core.zip(base, 'nalssam-html-ppt'));
-fs.writeFileSync(path.join(root, 'site/downloads/nalssam-html-ppt.zip'), baseZip);
+const zips = {}, all = {};
+fs.readdirSync(path.join(root, 'skills')).sort().forEach(name => {
+  const dir = path.join(root, 'skills', name);
+  if (!fs.existsSync(path.join(dir, 'SKILL.md'))) return;
+  const files = tree(dir);
+  zips[name] = Buffer.from(core.zip(files, name));
+  Object.keys(files).forEach(k => { all[name + '/' + k] = files[k]; });
+  fs.writeFileSync(path.join(root, 'site/downloads', name + '.zip'), zips[name]);
+});
+zips['bunpil-skill-pack'] = Buffer.from(core.zip(all, ''));
+fs.writeFileSync(path.join(root, 'site/downloads/bunpil-skill-pack.zip'), zips['bunpil-skill-pack']);
+const baseZip = zips['nalssam-html-ppt'];
+
 function render(kind) {
   const v = variants[kind];
   return src.replace('__SAVE_HOW__', v.how).replace('__SAVE_BOXES__', v.boxes).replace('__REPO__', REPO)
     .replace('/*__CORE__*/', () => coreJs).replace('/*__SAVE__*/', () => SAVE[kind]).replace('__DATA__', () => kind === 'artifact' ? json.replace(/\}$/, ',"baseZip":"' + baseZip.toString('base64') + '"}') : json).replace('__ARTIFACT__', String(kind === 'artifact'));
 }
 fs.writeFileSync(path.join(root, 'site/artifact.html'), render('artifact'));
-fs.writeFileSync(path.join(root, 'site/index.html'),
-  '<!doctype html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
-  '<meta name="description" content="색·글꼴·모양을 고르면 나만의 HTML PPT 스킬이 나옵니다. Claude 와 Codex 에 붙여 씁니다.">\n</head>\n<body style="margin:0">\n' + render('web') + '\n</body>\n</html>\n');
+const shell = body => '<!doctype html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
+  '<meta name="description" content="색·글꼴·모양을 고르면 나만의 HTML PPT 스킬이 나옵니다. Claude 와 Codex 에 붙여 씁니다.">\n</head>\n<body style="margin:0">\n' + body + '\n</body>\n</html>\n';
+fs.writeFileSync(path.join(root, 'site/builder.html'), shell(render('web')));
 
-console.log('site/index.html', Math.round(fs.statSync(path.join(root, 'site/index.html')).size / 1024) + 'KB',
-  '· site/artifact.html · site/downloads/nalssam-html-ppt.zip', Object.keys(base).length + '개 파일');
+
+// 분필팩 첫 화면
+const BUILDER_ARTIFACT = 'https://claude.ai/artifact/Q4h9pif6Z6zMBKNNGGvCH2';
+const baseCss = (src.match(/<style>([\s\S]*?)<\/style>/) || [])[1];
+const home = fs.readFileSync(path.join(root, 'site/src/home.html'), 'utf8');
+const HOME_SAVE = {
+  web: `document.addEventListener('click',function(e){var b=e.target.closest('[data-zip]');if(!b)return;location.href='downloads/'+b.dataset.zip+'.zip'});`,
+  artifact: `var zb=[].slice.call(document.querySelectorAll('[data-zip]'));zb.forEach(function(b){b.hidden=true});
+  if(window.claude&&window.claude.use)window.claude.use('downloads').then(function(d){
+    if(!d)return;zb.forEach(function(b){b.hidden=false});
+    document.addEventListener('click',function(e){var b=e.target.closest('[data-zip]');if(!b)return;var n=b.dataset.zip,s=atob(DATA.zips[n]),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);
+      var say=function(t){$('saved').hidden=false;$('saved').textContent=t};
+      d.save({filename:n+'.zip',data:u}).then(function(){say(n+'.zip 을 저장했습니다')},function(er){say(er&&er.code==='declined'?'저장을 취소했습니다':er&&er.code==='rate_limited'?'잠시 뒤 다시 눌러 주세요':'파일을 저장하지 못했습니다')})});
+  });`,
+};
+function renderHome(kind) {
+  const data = kind === 'artifact' ? { zips: Object.fromEntries(Object.entries(zips).map(([k, v]) => [k, v.toString('base64')])) } : {};
+  return home.replace('/*__BASE_CSS__*/', () => baseCss).replace('__REPO__', REPO)
+    .replace('__BUILDER__', kind === 'artifact' ? BUILDER_ARTIFACT : 'builder.html')
+    .replace('/*__SAVE__*/', () => HOME_SAVE[kind]).replace('__DATA__', () => JSON.stringify(data));
+}
+fs.writeFileSync(path.join(root, 'site/index.html'), shell(renderHome('web')).replace('나만의 HTML PPT 스킬이 나옵니다. Claude 와 Codex 에 붙여 씁니다.', '날쌤 분필팩 스킬을 한 줄로 Claude 와 Codex 에 설치합니다.'));
+fs.writeFileSync(path.join(root, 'site/pack-artifact.html'), renderHome('artifact'));
+console.log('site/index.html · builder.html · artifact.html · pack-artifact.html · downloads:', Object.keys(zips).join(', '));

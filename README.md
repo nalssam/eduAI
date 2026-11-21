@@ -2,17 +2,45 @@
 
 날쌤(nalssam)의 교육용 AI 스킬 모음. 날쌤 분필팩에 들어갈 스킬과, 누구나 자기 스타일의 스킬을 만들어 가는 고르기 판을 여기서 다듬는다.
 
+## 한 줄로 설치하기
+
+Claude Code(`~/.claude/skills`)와 Codex(`~/.agents/skills`)에 팩의 스킬을 한 번에 넣는다.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nalssam/eduAI/main/install.sh | sh
+```
+
+```powershell
+irm https://raw.githubusercontent.com/nalssam/eduAI/main/install.ps1 | iex
+```
+
+```bash
+npx skills add nalssam/eduAI -g -a claude-code codex -s '*' -y
+```
+
+Claude 앱에는 `site/downloads/` 의 스킬별 ZIP 을 설정 > 기능(코드 실행 켜기) → 사용자 지정 > 스킬 > 스킬 업로드로 올린다.
+
 ## 들어 있는 것
 
 | 위치 | 하는 일 |
 |---|---|
-| [`skills/nalssam-html-ppt`](skills/nalssam-html-ppt/SKILL.md) | 날쌤 스타일 발표 덱을 브라우저로 여는 HTML 파일 하나로 만드는 스킬. 설정 한 줄을 받으면 "나만의 스킬"도 찍어 낸다 |
-| [`site/index.html`](site/index.html) | 고르기 판(웹사이트용). 색·글꼴·모양을 고르면 나만의 스킬 ZIP 이 내려온다 |
-| `site/artifact.html` | 같은 고르기 판의 Claude 아티팩트용. `downloads` 권한을 켜고 올리면 ZIP 을 바로 받고, 없으면 설정 한 줄을 복사해 쓴다 |
-| `site/downloads/nalssam-html-ppt.zip` | 날쌤 기본 스킬 설치 파일 |
-| `tools/` | 고르기 판 빌드, 한국 서비스 대표색 목록 갱신 |
+| [`skills/nalssam-html-ppt`](skills/nalssam-html-ppt/SKILL.md) | 날쌤 스타일 발표 덱을 브라우저로 여는 HTML 파일 하나로 만든다. 설정 한 줄을 받으면 "나만의 스킬"도 찍어 낸다 |
+| [`skills/nalssam-pptx`](skills/nalssam-pptx/SKILL.md) | 날쌤 스타일 연수 원고 PPTX. 공개판(제안서·IR 모드와 개인 프로필 상수 제외) |
+| [`skills/pdf`](skills/pdf/SKILL.md) | PDF 읽기·합치기·나누기·양식 채우기. [anthropics/skills](https://github.com/anthropics/skills) 의 것을 그대로 담았다(Apache 2.0, `LICENSE.txt`) |
+| [`site/index.html`](site/index.html) | 분필팩 첫 화면: 한 줄 설치, 스킬별 ZIP, 붙이는 법 |
+| [`site/builder.html`](site/builder.html) | 스타일 고르기 판. 색·글꼴·모양을 고르면 나만의 스킬 ZIP 이 내려온다 |
+| `site/pack-artifact.html` · `site/artifact.html` | 두 화면의 Claude 아티팩트용. `downloads` 권한을 켜고 올린다 |
+| `site/downloads/` | 스킬별 ZIP 과 `bunpil-skill-pack.zip`(전체) |
+| `install.sh` · `install.ps1` | 한 줄 설치 스크립트. 같은 이름의 스킬이 있으면 `skills-backup-날짜시각` 으로 옮기고 넣는다 |
+| `tools/` | 사이트 빌드, 한국 서비스 대표색 목록 갱신 |
 
-## 쓰는 흐름
+팩에 담지 않고 원본에서 받는 것: HWPX 한글 문서 스킬은 [jkf87/hwpx-skill](https://github.com/jkf87/hwpx-skill) 에 라이선스가 적혀 있지 않아 복사하지 않는다.
+
+```bash
+npx skills add jkf87/hwpx-skill -g -a claude-code codex -y
+```
+
+## 나만의 스킬 만드는 흐름
 
 1. **고르기** — 고르기 판에서 출발점(날쌤 기본·칠판·네이비·한국 서비스 톤 29가지), 색, 글꼴, 모서리, 카드, 배경 무늬, 제목 꾸밈, 움직임, 말투를 고른다. 견본이 바로 바뀐다.
 2. **저장하기** — `나만의 스킬 ZIP 받기`. 버튼이 없는 화면에서는 `설정 한 줄 복사` → 날쌤 기본 스킬을 붙여 둔 Claude 에 붙여 넣고 "이 설정으로 스킬 저장해 줘".
