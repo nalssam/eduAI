@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="색·글꼴·모양을 고르면 날쌤 분필팩 스킬을 한 줄로 Claude 와 Codex 에 설치합니다.">
+</head>
+<body style="margin:0">
+<title>날쌤 분필팩 스킬</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+
+/* 배치: 왼쪽에서 고르고 오른쪽 견본이 따라 바뀐다. 좁은 화면에서는 견본이 위에 붙는다. */
+:root{
+  --bg:#FBFAF6; --panel:#FFFFFF; --ink:#132C3D; --sub:#586875; --line:#E4DFD3; --soft:#F3F0E8;
+  --key:#18766B; --key-soft:#E3F0EC; --on-key:#FFFFFF; --point:#D9734E; --warn:#A8501F;
+  --sans:"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:56px}
+h1,h2,h3,p,ol,ul,fieldset,legend{margin:0;padding:0}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.02em;line-height:1.25}
+ol,ul{list-style:none}
+fieldset{border:0;min-width:0}
+a{color:var(--key)}
+:focus-visible{outline:3px solid var(--key);outline-offset:2px}
+.eyebrow{font-size:13px;font-weight:700;color:var(--key);letter-spacing:.08em}
+h1{font-size:clamp(30px,5vw,48px);font-weight:900}
+h1 em{font-style:normal;color:var(--key)}
+h2{font-size:26px;font-weight:900}
+.lead{font-size:18px;color:var(--sub);max-width:38em}
+.top{display:flex;flex-direction:column;gap:16px}
+
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:how}
+.how li{counter-increment:how;border-top:3px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+.how li::before{content:counter(how,decimal-leading-zero);font-size:13px;font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+.how b{font-size:18px}
+.how span{color:var(--sub);font-size:15px}
+
+.sec{display:flex;flex-direction:column;gap:20px}
+.build{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
+.opts{display:flex;flex-direction:column;gap:28px;min-width:0}
+.grp{display:flex;flex-direction:column;gap:12px}
+.grp>legend{font-size:17px;font-weight:700;margin-bottom:10px}
+.grp>legend small{font-weight:400;color:var(--sub);font-size:14px;margin-left:8px}
+.lbl{font-size:13px;font-weight:700;color:var(--sub)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.pick{position:relative}
+.pick input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.pick span{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--panel);font-size:14.5px;font-weight:500}
+.pick i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(128,128,128,.35)}
+.pick input:checked+span{border-color:var(--key);background:var(--key-soft);color:var(--ink);font-weight:700}
+.pick input:focus-visible+span{outline:3px solid var(--key);outline-offset:2px}
+.brands{max-height:212px;overflow:auto;padding:4px;border:1.5px solid var(--line);border-radius:14px;background:var(--panel)}
+.brands .pick span{border-color:transparent;background:transparent;min-height:36px;padding:4px 10px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type=text]{width:100%;min-height:44px;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit}
+.color{display:flex;align-items:center;gap:8px}
+.color input[type=color]{width:44px;height:44px;padding:0;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);flex:none}
+.color input[type=text]{font-family:var(--mono);font-size:14px}
+.hint{font-size:13.5px;color:var(--sub)}
+.note{font-size:13.5px;color:var(--warn);font-weight:500}
+.err{font-size:13.5px;color:var(--point);font-weight:700}
+
+.pv{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:12px;min-width:0}
+.pvbox{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft)}
+#pvhost{position:absolute;inset:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{min-height:36px;padding:4px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:500 13.5px var(--sans);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.save{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.box{border:1.5px solid var(--line);border-radius:14px;background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.box h3{font-size:18px;font-weight:700}
+.line{font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--soft);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all;user-select:all;min-height:96px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:8px 20px;border-radius:10px;border:0;background:var(--key);color:var(--on-key);font:700 16px var(--sans);cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ok{font-size:14px;font-weight:700;color:var(--key)}
+
+.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.guide .box ol{counter-reset:g;display:flex;flex-direction:column;gap:8px}
+.guide .box li{counter-increment:g;display:grid;grid-template-columns:24px 1fr;font-size:15px}
+.guide .box li::before{content:counter(g);font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:2px 6px;border-radius:6px;word-break:break-all}
+.foot{font-size:13.5px;color:var(--sub);border-top:1.5px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:4px}
+
+@media (max-width:860px){
+  .build{grid-template-columns:minmax(0,1fr)}
+  .pv{order:-1;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
+  .how,.save,.guide{grid-template-columns:minmax(0,1fr)}
+  .two{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 이 쪽만의 것: 설치 한 줄, 스킬 표 */
+.cmd{display:flex;flex-direction:column;gap:12px}
+.cmd pre{margin:0;font-family:var(--mono);font-size:14px;line-height:1.6;background:var(--ink);color:var(--bg);border-radius:12px;padding:16px 18px;overflow-x:auto;white-space:pre;user-select:all}
+.os{display:flex;flex-wrap:wrap;gap:6px}
+.os button{min-height:40px;padding:6px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);font:500 14.5px var(--sans);cursor:pointer}
+.os button[aria-pressed=true]{background:var(--key-soft);border-color:var(--key);font-weight:700}
+.skills{display:flex;flex-direction:column;border-top:3px solid var(--ink)}
+.sk{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr) auto;gap:8px 24px;align-items:center;padding:20px 0;border-bottom:1.5px solid var(--line)}
+.sk h3{font-size:19px;font-weight:700}
+.sk h3 small{display:block;font:500 13px var(--mono);color:var(--sub);margin-top:2px}
+.sk p{color:var(--sub);font-size:15px}
+.sk p b{color:var(--ink);font-weight:500}
+.tag{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--key-soft);color:var(--key);margin-right:6px}
+.tag.out{background:transparent;border:1.5px solid var(--line);color:var(--sub)}
+.sk .btn{min-height:44px;font-size:15px;white-space:nowrap}
+.sk code.one{display:block;margin-top:8px;padding:8px 10px;font-size:13px;user-select:all}
+.cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;border:1.5px solid var(--ink);border-radius:14px;padding:24px}
+.cta b{font-size:20px;font-weight:900;display:block}
+.cta span{color:var(--sub)}
+@media (max-width:860px){.sk{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">날쌤 분필팩</p>
+    <h1>한 줄 붙여 넣으면<br><em>내 AI 에 스킬이 붙습니다</em></h1>
+    <p class="lead">발표 자료, 연수 원고 PPT, PDF, 한글 문서까지. 날쌤이 수업과 연수에서 쓰는 스킬을 Claude 와 Codex 에 한 번에 넣습니다.</p>
+  </header>
+
+  <section class="sec" aria-labelledby="h-one">
+    <h2 id="h-one">한 줄로 설치하기</h2>
+    <div class="box cmd">
+      <div class="os" id="os" role="group" aria-label="쓰는 컴퓨터 고르기">
+        <button type="button" data-k="win">Windows</button><button type="button" data-k="mac">Mac · Linux</button><button type="button" data-k="npx">Node 가 있는 분</button>
+      </div>
+      <p class="hint" id="os-how"></p>
+      <pre id="cmdline" tabindex="0" aria-label="설치 명령"></pre>
+      <div class="acts"><button type="button" class="btn" id="copy">명령 복사</button><span class="ok" id="copied" role="status" hidden></span></div>
+      <p class="hint">Claude Code(<code>~/.claude/skills</code>)와 Codex(<code>~/.agents/skills</code>)에 아래 표의 "팩에 포함" 스킬을 넣습니다. 설치 뒤 Claude Code 나 Codex 를 새로 엽니다.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-skills">
+    <h2 id="h-skills">들어 있는 스킬</h2>
+    <div class="skills">
+      <div class="sk"><h3>날쌤 HTML PPT<small>nalssam-html-ppt</small></h3>
+        <p><span class="tag">팩에 포함</span><b>브라우저로 여는 발표 덱</b>을 파일 하나로 만듭니다. 결론 문장 제목, 장마다 대본, 넘기기·단계 등장·PDF 저장.</p>
+        <button type="button" class="btn ghost" data-zip="nalssam-html-ppt">ZIP 받기</button></div>
+      <div class="sk"><h3>날쌤 PPTX<small>nalssam-pptx</small></h3>
+        <p><span class="tag">팩에 포함</span><b>파워포인트 파일</b>로 연수 원고 덱을 만듭니다. 글꼴이 파일에 들어가고 메모란에 대본이 붙습니다. 공개판이라 제안서 모드는 빠져 있습니다.</p>
+        <button type="button" class="btn ghost" data-zip="nalssam-pptx">ZIP 받기</button></div>
+      <div class="sk"><h3>PDF<small>pdf</small></h3>
+        <p><span class="tag">팩에 포함</span><b>PDF 읽기·합치기·나누기·양식 채우기.</b> Anthropic 이 공개한 스킬입니다(Apache 2.0). Claude 앱에는 이미 들어 있어 Codex 와 Claude Code 에서 쓸 때 필요합니다.</p>
+        <button type="button" class="btn ghost" data-zip="pdf">ZIP 받기</button></div>
+      <div class="sk"><h3>HWPX 한글 문서<small>hwpx</small></h3>
+        <p><span class="tag out">원본에서 설치</span><b>한글(.hwp·.hwpx) 문서 만들기·변환·양식 채우기.</b> jkf87 님이 만든 스킬이라 팩에 복사하지 않고 원본 저장소에서 바로 받습니다. Node 가 필요합니다.
+          <code class="one" id="hwpx-cmd">npx skills add jkf87/hwpx-skill -g -a claude-code codex -y</code></p>
+        <a class="btn ghost" href="https://github.com/jkf87/hwpx-skill">원본 열기</a></div>
+      <div class="sk"><h3>Docs 문서<small>docs</small></h3>
+        <p><span class="tag out">설치 불필요</span><b>함께 고치는 문서.</b> Claude 앱에 기본으로 들어 있는 기능이라 따로 받을 것이 없습니다. Claude 앱에서 "문서로 만들어 줘"라고 하면 됩니다.</p>
+        <span></span></div>
+    </div>
+    <div class="acts"><button type="button" class="btn" data-zip="bunpil-skill-pack">팩 전체 ZIP 받기</button><span class="ok" id="saved" role="status" hidden></span></div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-app">
+    <h2 id="h-app">Claude 앱에 올리기</h2>
+    <div class="guide">
+      <div class="box"><h3>Claude 앱 (웹·데스크톱)</h3><ol>
+        <li><span>위 표에서 쓸 스킬의 <b>ZIP 받기</b>를 누릅니다. 스킬 하나에 ZIP 하나입니다.</span></li>
+        <li><span>설정 &gt; 기능에서 <b>코드 실행 및 파일 생성</b>을 켭니다.</span></li>
+        <li><span><b>사용자 지정 &gt; 스킬</b>에서 + &gt; 스킬 만들기 &gt; <b>스킬 업로드</b>에 ZIP 을 풀지 않고 올립니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Claude Code</h3><ol>
+        <li><span>위의 한 줄을 터미널에 붙여 넣습니다.</span></li>
+        <li><span>Claude Code 를 새로 열고 <code>/nalssam-html-ppt</code> 로 부르거나 그냥 부탁합니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Codex</h3><ol>
+        <li><span>위의 한 줄을 터미널에 붙여 넣습니다.</span></li>
+        <li><span>Codex 를 새로 열고 <code>$nalssam-html-ppt</code> 로 부릅니다.</span></li>
+      </ol></div>
+    </div>
+    <p class="hint">메뉴 이름은 2026년 11월 공식 도움말 기준입니다.</p>
+  </section>
+
+  <div class="cta">
+    <div><b>내 색과 글꼴로 바꾸고 싶다면</b><span>고르기 판에서 고르면 나만의 HTML PPT 스킬이 나옵니다.</span></div>
+    <a class="btn" href="builder.html">스타일 고르러 가기</a>
+  </div>
+
+  <footer class="foot">
+    <span>PDF 스킬: <a href="https://github.com/anthropics/skills">anthropics/skills</a> · Apache 2.0 (LICENSE 포함) · HWPX 스킬: <a href="https://github.com/jkf87/hwpx-skill">jkf87/hwpx-skill</a></span>
+    <span>설치 명령은 <a href="https://github.com/vercel-labs/skills">skills CLI</a> 와 이 저장소의 install 스크립트를 씁니다. 스크립트 내용은 저장소에서 볼 수 있습니다.</span>
+    <span>만든 곳: <a href="https://github.com/nalssam/eduAI">nalssam/eduAI</a></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var DATA={};
+  var $=function(id){return document.getElementById(id)};
+  var CMD={
+    win:['PowerShell 을 열고(시작 버튼 → "PowerShell" 검색) 아래 한 줄을 붙여 넣고 Enter 를 누릅니다. 같은 이름의 스킬이 이미 있으면 지우지 않고 옆 폴더로 옮겨 둡니다.','irm https://raw.githubusercontent.com/nalssam/eduAI/main/install.ps1 | iex'],
+    mac:['터미널을 열고 아래 한 줄을 붙여 넣고 Enter 를 누릅니다. 같은 이름의 스킬이 이미 있으면 지우지 않고 옆 폴더로 옮겨 둡니다.','curl -fsSL https://raw.githubusercontent.com/nalssam/eduAI/main/install.sh | sh'],
+    npx:['Node.js 22 이상이 있다면 이 방법이 가장 깔끔합니다. Cursor 같은 다른 도구에도 넣을 수 있습니다.',"npx skills add nalssam/eduAI -g -a claude-code codex -s '*' -y"]
+  };
+  var cur=/Win/i.test(navigator.platform||navigator.userAgent)?'win':'mac';
+  function draw(){$('os-how').textContent=CMD[cur][0];$('cmdline').textContent=CMD[cur][1];[].forEach.call($('os').children,function(b){b.setAttribute('aria-pressed',b.dataset.k===cur)})}
+  $('os').addEventListener('click',function(e){var b=e.target.closest('button');if(b){cur=b.dataset.k;draw()}});
+  $('copy').addEventListener('click',function(){
+    var text=$('cmdline').textContent,ok=$('copied');
+    function done(t){ok.textContent=t;ok.hidden=false;setTimeout(function(){ok.hidden=true},2500)}
+    function select(){var r=document.createRange();r.selectNodeContents($('cmdline'));var s=getSelection();s.removeAllRanges();s.addRange(r);done('복사가 막혀 글자를 선택해 두었습니다. Ctrl+C 를 누르세요')}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){done('복사했습니다')},select);else select();
+  });
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-zip]');if(!b)return;location.href='downloads/'+b.dataset.zip+'.zip'});
+  draw();
+})();
+</script>
+
+</body>
+</html>

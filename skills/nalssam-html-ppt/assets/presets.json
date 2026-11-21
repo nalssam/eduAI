@@ -1,0 +1,495 @@
+{
+ "source": "ko/design.md (getdesign.kr) · CC BY 4.0",
+ "brands": [
+  {
+   "slug": "laftel",
+   "name": "라프텔",
+   "cat": "content",
+   "key": "#816BFF",
+   "src": "hex",
+   "via": "point",
+   "radii": [
+    3,
+    4,
+    8,
+    16
+   ],
+   "url": "https://www.getdesign.kr/services/laftel"
+  },
+  {
+   "slug": "chzzk",
+   "name": "치지직",
+   "cat": "content",
+   "key": "#1BB373",
+   "src": "hex",
+   "via": "brand-strongest",
+   "radii": [
+    2,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/chzzk"
+  },
+  {
+   "slug": "banksalad",
+   "name": "뱅크샐러드",
+   "cat": "finance",
+   "key": "#06A96C",
+   "src": "hex",
+   "via": "green-normal",
+   "radii": [
+    6,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/banksalad"
+  },
+  {
+   "slug": "ridi",
+   "name": "리디",
+   "cat": "content",
+   "key": "#1E9EFF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4
+   ],
+   "url": "https://www.getdesign.kr/services/ridi"
+  },
+  {
+   "slug": "nol",
+   "name": "NOL",
+   "cat": "travel",
+   "key": "#3549FF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    6,
+    8,
+    10,
+    12,
+    16,
+    20,
+    24,
+    28
+   ],
+   "url": "https://www.getdesign.kr/services/nol"
+  },
+  {
+   "slug": "lg-electronics",
+   "name": "LG전자",
+   "cat": "etc",
+   "key": "#FD312E",
+   "src": "hex",
+   "via": "active-red",
+   "radii": [
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20,
+    24,
+    28
+   ],
+   "url": "https://www.getdesign.kr/services/lg-electronics"
+  },
+  {
+   "slug": "zigbang",
+   "name": "직방",
+   "cat": "etc",
+   "key": "#FF6905",
+   "src": "hex",
+   "via": "orange1",
+   "radii": [],
+   "url": "https://www.getdesign.kr/services/zigbang"
+  },
+  {
+   "slug": "remember",
+   "name": "리멤버",
+   "cat": "career",
+   "key": "#000000",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    6,
+    8,
+    10
+   ],
+   "url": "https://www.getdesign.kr/services/remember"
+  },
+  {
+   "slug": "gs-shop",
+   "name": "GS SHOP",
+   "cat": "commerce",
+   "key": "#0F78FF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    6,
+    8,
+    12,
+    16,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/gs-shop"
+  },
+  {
+   "slug": "likelion",
+   "name": "멋쟁이사자처럼",
+   "cat": "education",
+   "key": "#FF6000",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/likelion"
+  },
+  {
+   "slug": "gs-retail",
+   "name": "우리동네GS",
+   "cat": "commerce",
+   "key": "#00D4EA",
+   "src": "hex",
+   "via": "signature-cyan",
+   "radii": [],
+   "url": "https://www.getdesign.kr/services/gs-retail"
+  },
+  {
+   "slug": "samsung-one-ui",
+   "name": "삼성 One UI",
+   "cat": "developer",
+   "key": "#0381FE",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    12,
+    18,
+    20,
+    26
+   ],
+   "url": "https://www.getdesign.kr/services/samsung-one-ui"
+  },
+  {
+   "slug": "greeting",
+   "name": "그리팅",
+   "cat": "career",
+   "key": "#1890FF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    6,
+    8,
+    10,
+    14,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/greeting"
+  },
+  {
+   "slug": "yeogi",
+   "name": "여기어때",
+   "cat": "travel",
+   "key": "#F7323F",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    3,
+    4,
+    8,
+    10,
+    12,
+    16,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/yeogi"
+  },
+  {
+   "slug": "codeit",
+   "name": "코드잇",
+   "cat": "education",
+   "key": "#6500C3",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    16,
+    20,
+    24,
+    28
+   ],
+   "url": "https://www.getdesign.kr/services/codeit"
+  },
+  {
+   "slug": "class101",
+   "name": "클래스101",
+   "cat": "education",
+   "key": "#FF5D00",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    8,
+    12,
+    16,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/class101"
+  },
+  {
+   "slug": "bezier",
+   "name": "채널톡",
+   "cat": "developer",
+   "key": "#6157EA",
+   "src": "oklch",
+   "via": "blue-400",
+   "radii": [
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/bezier"
+  },
+  {
+   "slug": "kyobobook",
+   "name": "교보문고",
+   "cat": "commerce",
+   "key": "#5055B1",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/kyobobook"
+  },
+  {
+   "slug": "11st",
+   "name": "11번가",
+   "cat": "commerce",
+   "key": "#FF0038",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    8,
+    12,
+    16
+   ],
+   "url": "https://www.getdesign.kr/services/11st"
+  },
+  {
+   "slug": "line-design-system",
+   "name": "라인",
+   "cat": "messenger",
+   "key": "#06C755",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    3,
+    5,
+    7,
+    12
+   ],
+   "url": "https://www.getdesign.kr/services/line-design-system"
+  },
+  {
+   "slug": "gmarket",
+   "name": "지마켓",
+   "cat": "commerce",
+   "key": "#00C400",
+   "src": "hex",
+   "via": "green-500",
+   "radii": [
+    2,
+    4,
+    8,
+    12,
+    16
+   ],
+   "url": "https://www.getdesign.kr/services/gmarket"
+  },
+  {
+   "slug": "socar",
+   "name": "쏘카",
+   "cat": "mobility",
+   "key": "#0078FF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/socar"
+  },
+  {
+   "slug": "baemin",
+   "name": "배달의민족",
+   "cat": "delivery",
+   "key": "#0CEFD3",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    8,
+    12,
+    16,
+    20
+   ],
+   "url": "https://www.getdesign.kr/services/baemin"
+  },
+  {
+   "slug": "seed-design",
+   "name": "당근",
+   "cat": "community",
+   "key": "#FF6600",
+   "src": "hex",
+   "via": "carrot-600",
+   "radii": [
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/seed-design"
+  },
+  {
+   "slug": "teamsparta",
+   "name": "팀스파르타",
+   "cat": "education",
+   "key": "#FA0030",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    6,
+    16
+   ],
+   "url": "https://www.getdesign.kr/services/teamsparta"
+  },
+  {
+   "slug": "wanted",
+   "name": "원티드",
+   "cat": "career",
+   "key": "#0066FF",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/wanted"
+  },
+  {
+   "slug": "toss",
+   "name": "토스",
+   "cat": "finance",
+   "key": "#3182F6",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    8,
+    12,
+    14,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/toss"
+  },
+  {
+   "slug": "vapor-ui",
+   "name": "구름",
+   "cat": "developer",
+   "key": "#2A72E5",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    2,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   "url": "https://www.getdesign.kr/services/vapor-ui"
+  },
+  {
+   "slug": "krds",
+   "name": "KRDS",
+   "cat": "gov",
+   "key": "#256EF4",
+   "src": "hex",
+   "via": "primary",
+   "radii": [
+    4,
+    6,
+    8,
+    10,
+    12
+   ],
+   "url": "https://www.getdesign.kr/services/krds"
+  }
+ ]
+}

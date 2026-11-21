@@ -1,0 +1,317 @@
+<title>HTML PPT 스킬 공방</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* 배치: 왼쪽에서 고르고 오른쪽 견본이 따라 바뀐다. 좁은 화면에서는 견본이 위에 붙는다. */
+:root{
+  --bg:#FBFAF6; --panel:#FFFFFF; --ink:#132C3D; --sub:#586875; --line:#E4DFD3; --soft:#F3F0E8;
+  --key:#18766B; --key-soft:#E3F0EC; --on-key:#FFFFFF; --point:#D9734E; --warn:#A8501F;
+  --sans:"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10222E; --panel:#17303F; --ink:#F4F1E8; --sub:#A9B8C2; --line:#2C4656; --soft:#1D3A4B;
+  --key:#7FD1C1; --key-soft:#1C4347; --on-key:#10222E; --point:#F0957A; --warn:#F6C177; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:56px}
+h1,h2,h3,p,ol,ul,fieldset,legend{margin:0;padding:0}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.02em;line-height:1.25}
+ol,ul{list-style:none}
+fieldset{border:0;min-width:0}
+a{color:var(--key)}
+:focus-visible{outline:3px solid var(--key);outline-offset:2px}
+.eyebrow{font-size:13px;font-weight:700;color:var(--key);letter-spacing:.08em}
+h1{font-size:clamp(30px,5vw,48px);font-weight:900}
+h1 em{font-style:normal;color:var(--key)}
+h2{font-size:26px;font-weight:900}
+.lead{font-size:18px;color:var(--sub);max-width:38em}
+.top{display:flex;flex-direction:column;gap:16px}
+
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:how}
+.how li{counter-increment:how;border-top:3px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+.how li::before{content:counter(how,decimal-leading-zero);font-size:13px;font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+.how b{font-size:18px}
+.how span{color:var(--sub);font-size:15px}
+
+.sec{display:flex;flex-direction:column;gap:20px}
+.build{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
+.opts{display:flex;flex-direction:column;gap:28px;min-width:0}
+.grp{display:flex;flex-direction:column;gap:12px}
+.grp>legend{font-size:17px;font-weight:700;margin-bottom:10px}
+.grp>legend small{font-weight:400;color:var(--sub);font-size:14px;margin-left:8px}
+.lbl{font-size:13px;font-weight:700;color:var(--sub)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.pick{position:relative}
+.pick input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.pick span{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--panel);font-size:14.5px;font-weight:500}
+.pick i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(128,128,128,.35)}
+.pick input:checked+span{border-color:var(--key);background:var(--key-soft);color:var(--ink);font-weight:700}
+.pick input:focus-visible+span{outline:3px solid var(--key);outline-offset:2px}
+.brands{max-height:212px;overflow:auto;padding:4px;border:1.5px solid var(--line);border-radius:14px;background:var(--panel)}
+.brands .pick span{border-color:transparent;background:transparent;min-height:36px;padding:4px 10px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type=text]{width:100%;min-height:44px;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit}
+.color{display:flex;align-items:center;gap:8px}
+.color input[type=color]{width:44px;height:44px;padding:0;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);flex:none}
+.color input[type=text]{font-family:var(--mono);font-size:14px}
+.hint{font-size:13.5px;color:var(--sub)}
+.note{font-size:13.5px;color:var(--warn);font-weight:500}
+.err{font-size:13.5px;color:var(--point);font-weight:700}
+
+.pv{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:12px;min-width:0}
+.pvbox{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;border:1.5px solid var(--line);background:var(--soft)}
+#pvhost{position:absolute;inset:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{min-height:36px;padding:4px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:500 13.5px var(--sans);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.save{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.box{border:1.5px solid var(--line);border-radius:14px;background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.box h3{font-size:18px;font-weight:700}
+.line{font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--soft);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all;user-select:all;min-height:96px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:8px 20px;border-radius:10px;border:0;background:var(--key);color:var(--on-key);font:700 16px var(--sans);cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ok{font-size:14px;font-weight:700;color:var(--key)}
+
+.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.guide .box ol{counter-reset:g;display:flex;flex-direction:column;gap:8px}
+.guide .box li{counter-increment:g;display:grid;grid-template-columns:24px 1fr;font-size:15px}
+.guide .box li::before{content:counter(g);font-weight:700;color:var(--key);font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.88em;background:var(--soft);padding:2px 6px;border-radius:6px;word-break:break-all}
+.foot{font-size:13.5px;color:var(--sub);border-top:1.5px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:4px}
+
+@media (max-width:860px){
+  .build{grid-template-columns:minmax(0,1fr)}
+  .pv{order:-1;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
+  .how,.save,.guide{grid-template-columns:minmax(0,1fr)}
+  .two{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">날쌤 분필팩</p>
+    <h1>골라서 저장하면<br><em>나만의 HTML PPT 스킬</em></h1>
+    <p class="lead">색·글꼴·모양을 고르면 그 얼굴로 발표 덱을 만드는 스킬이 나옵니다. Claude 와 Codex 에 붙여서 "이 내용으로 PPT 만들어 줘" 한마디로 씁니다.</p>
+  </header>
+
+  <ol class="how" aria-label="쓰는 순서">
+    <li><b>고르기</b><span>아래에서 출발점·색·글꼴·모양을 고릅니다. 오른쪽 견본이 바로 바뀝니다.</span></li>
+    <li><b>저장하기</b><span>__SAVE_HOW__</span></li>
+    <li><b>붙이기</b><span>받은 스킬을 Claude 앱, Claude Code, Codex 중 쓰는 곳에 올립니다.</span></li>
+  </ol>
+
+  <section class="sec" aria-labelledby="h-build">
+    <h2 id="h-build">스타일 고르기</h2>
+    <div class="build">
+      <form class="opts" id="f" autocomplete="off">
+        <fieldset class="grp"><legend>출발점<small>고르면 색과 둥글기가 따라옵니다</small></legend>
+          <div class="row" id="o-preset"></div>
+          <span class="lbl" id="l-brand">한국 서비스 톤 <span id="n-brand"></span>가지</span>
+          <div class="row brands" id="o-brand" role="group" aria-labelledby="l-brand"></div>
+          <p class="hint" id="brand-note">대표색과 둥글기는 ko/design.md 카탈로그(getdesign.kr)의 공개 값입니다. 바탕과 글자색은 이 도구가 맞춥니다.</p>
+        </fieldset>
+
+        <fieldset class="grp"><legend>색과 바탕</legend>
+          <span class="lbl">바탕</span><div class="row" id="o-ground"></div>
+          <div class="two">
+            <div class="field"><label class="lbl" for="key-t">포인트 색</label><div class="color"><input type="color" id="key-c" aria-label="포인트 색 고르기"><input type="text" id="key-t" maxlength="7" spellcheck="false"></div></div>
+            <div class="field"><label class="lbl" for="point-t">보조 포인트 색</label><div class="color"><input type="color" id="point-c" aria-label="보조 포인트 색 고르기"><input type="text" id="point-t" maxlength="7" spellcheck="false"></div></div>
+          </div>
+          <p class="note" id="key-note" hidden></p>
+        </fieldset>
+
+        <fieldset class="grp"><legend>글꼴</legend>
+          <span class="lbl">본문</span><div class="row" id="o-font"></div>
+          <span class="lbl">제목</span><div class="row" id="o-titleFont"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>모양</legend>
+          <span class="lbl">모서리</span><div class="row" id="o-radius"></div>
+          <span class="lbl">카드</span><div class="row" id="o-card"></div>
+          <span class="lbl">배경 무늬</span><div class="row" id="o-pattern"></div>
+          <span class="lbl">제목 꾸밈</span><div class="row" id="o-titlefx"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>움직임과 말투</legend>
+          <span class="lbl">움직임</span><div class="row" id="o-motion"></div>
+          <span class="lbl">화면 글 말투</span><div class="row" id="o-tone"></div>
+          <span class="lbl">대본</span><div class="row" id="o-script"></div>
+        </fieldset>
+
+        <fieldset class="grp"><legend>이름</legend>
+          <div class="two">
+            <div class="field"><label class="lbl" for="title">스킬 이름 (한글)</label><input type="text" id="title" maxlength="40"></div>
+            <div class="field"><label class="lbl" for="name">스킬 이름 (영어 소문자·숫자·하이픈)</label><input type="text" id="name" maxlength="64" spellcheck="false"></div>
+          </div>
+          <p class="err" id="name-err" hidden></p>
+          <div class="field"><label class="lbl" for="author">바닥글에 넣을 내 이름 (비워도 됩니다)</label><input type="text" id="author" maxlength="30"></div>
+        </fieldset>
+      </form>
+
+      <div class="pv">
+        <div class="pvbox"><div id="pvhost" role="img" aria-label="고른 스타일로 그린 견본 장"></div></div>
+        <div class="tabs" id="tabs" role="group" aria-label="견본 장 바꾸기"></div>
+        <p class="hint">견본 속 숫자와 문장은 모두 가상 예시입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-save">
+    <h2 id="h-save">저장하기</h2>
+    <div class="save">
+      __SAVE_BOXES__
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-guide">
+    <h2 id="h-guide">내 AI 에 붙이기</h2>
+    <div class="guide">
+      <div class="box"><h3>Claude 앱</h3><ol>
+        <li><span>설정 &gt; 기능에서 <b>코드 실행 및 파일 생성</b>을 켭니다.</span></li>
+        <li><span><b>사용자 지정 &gt; 스킬</b>에서 + 를 누르고 스킬 만들기 &gt; <b>스킬 업로드</b>를 고릅니다.</span></li>
+        <li><span>받은 ZIP 을 그대로 올립니다. 풀지 않습니다.</span></li>
+        <li><span>새 대화에서 "<span class="sk-title"></span>(으)로 PPT 만들어 줘"라고 합니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Claude Code</h3><ol>
+        <li><span>ZIP 을 풉니다.</span></li>
+        <li><span>폴더를 <code>~/.claude/skills/<span class="sk-name"></span>/</code> 에 둡니다. 한 프로젝트에서만 쓰려면 <code>.claude/skills/</code> 아래에 둡니다.</span></li>
+        <li><span><code>/<span class="sk-name"></span></code> 로 부르거나 그냥 PPT 를 부탁합니다.</span></li>
+      </ol></div>
+      <div class="box"><h3>Codex</h3><ol>
+        <li><span>ZIP 을 풉니다.</span></li>
+        <li><span>폴더를 <code>~/.agents/skills/<span class="sk-name"></span>/</code> 에 둡니다. 한 저장소에서만 쓰려면 <code>.agents/skills/</code> 아래에 둡니다.</span></li>
+        <li><span><code>$<span class="sk-name"></span></code> 로 부릅니다. 안 보이면 Codex 를 다시 켭니다.</span></li>
+      </ol></div>
+    </div>
+    <p class="hint">메뉴 이름은 2026년 11월 공식 도움말 기준입니다. 앱이 바뀌어 다르게 보이면 "스킬 업로드"를 찾으면 됩니다.</p>
+  </section>
+
+  <footer class="foot">
+    <span>한국 서비스 대표색: <a href="https://www.getdesign.kr/">ko/design.md (getdesign.kr)</a> · CC BY 4.0. 각 이름과 상표는 해당 기업의 것이며, 만들어지는 덱에는 브랜드 이름이 들어가지 않습니다.</span>
+    <span>구성 기준 <a href="https://designinwords.onpod.ai/">Design in words</a> · 이징 값 <a href="https://github.com/lifeprompt-team/remotion-scenes">Remotion Scenes</a> (MIT) · 글꼴 Pretendard·Google Fonts (SIL OFL)</span>
+    <span>만든 곳: <a href="__REPO__">nalssam/eduAI</a></span>
+  </footer>
+</div>
+
+<script>/*__CORE__*/</script>
+<script>
+(function(){
+  var C=PPTCore, DATA=__DATA__, ARTIFACT=__ARTIFACT__;
+  var $=function(id){return document.getElementById(id)};
+  var LABEL={
+    ground:{warm:'웜 오프화이트',white:'흰색',chalk:'칠판',navy:'네이비'},
+    radius:{'0':'각지게 0','8':'살짝 8','12':'보통 12','20':'둥글게 20'},
+    card:{line:'얇은 테두리',shadow:'옅은 그림자',fill:'옅은 면'},
+    pattern:{none:'없음',grid:'격자',dots:'점'},
+    titlefx:{none:'없음',bar:'짧은 밑줄',marker:'형광펜'},
+    motion:{basic:'기본',calm:'차분하게',off:'끔'},
+    tone:{haeyo:'~해요',hamnida:'~합니다'},
+    script:{live:'라이브 요점형',read:'녹화 낭독형'}
+  };
+  var PRESETS={
+    nalssam:{ko:'날쌤 기본',ground:'warm',key:'#18766B',point:'#D9734E',radius:'12'},
+    chalk:{ko:'칠판',ground:'chalk',key:'#9FE0CB',point:'#F6C177',radius:'12'},
+    navy:{ko:'네이비',ground:'navy',key:'#7FD1C1',point:'#F0957A',radius:'12'}
+  };
+  var cfg=C.normalize({});
+  try{var saved=localStorage.getItem('ppt-skill-cfg');if(saved)cfg=C.parseLine(saved)}catch(e){}
+
+  function radios(host,name,items,dot){
+    host.innerHTML='';
+    items.forEach(function(it){
+      var l=document.createElement('label');l.className='pick';
+      var i=document.createElement('input');i.type='radio';i.name=name;i.value=it[0];i.id=name+'-'+it[0];
+      var s=document.createElement('span');
+      if(it[2]){var d=document.createElement('i');d.style.background=it[2];s.appendChild(d)}
+      s.appendChild(document.createTextNode(it[1]));l.appendChild(i);l.appendChild(s);host.appendChild(l);
+    });
+  }
+  radios($('o-preset'),'preset',Object.keys(PRESETS).map(function(k){return [k,PRESETS[k].ko,PRESETS[k].key]}));
+  radios($('o-brand'),'brand',DATA.presets.brands.map(function(b){return [b.slug,b.name,b.key]}));
+  $('n-brand').textContent=DATA.presets.brands.length;
+  ['ground','radius','card','pattern','titlefx','motion','tone','script'].forEach(function(k){
+    radios($('o-'+k),k,C.CHOICES[k].map(function(v){return [v,LABEL[k][v],k==='ground'?C.GROUNDS[v].bg:null]}));
+  });
+  radios($('o-font'),'font',Object.keys(C.FONTS).map(function(k){return [k,C.FONTS[k].ko]}));
+  radios($('o-titleFont'),'titleFont',Object.keys(C.TITLE_FONTS).map(function(k){return [k,C.TITLE_FONTS[k].ko]}));
+
+  /* ── 견본: 스타터의 CSS 와 장을 그대로 가져와 섀도 DOM 에 그린다 ── */
+  var starter=DATA.files['assets/starter.html'];
+  var css=(starter.match(/<style>([\s\S]*?)<\/style>/)||[])[1]||'';
+  var stageHtml=starter.slice(starter.indexOf('<div id="stage"'),starter.indexOf('<div id="hud">'));
+  var host=$('pvhost'),sh=host.attachShadow({mode:'open'});
+  sh.innerHTML='<style>'+css.replace(/:root/g,':host').replace(/html,body\{[^}]*\}/,'')+
+    '#stage{position:absolute!important;left:0!important;top:0!important}.slide{animation:none!important}#bar{display:none}</style><style id="th"></style>'+stageHtml;
+  var stage=sh.getElementById('stage'),slides=[].slice.call(sh.querySelectorAll('.slide'));
+  slides.forEach(function(s,i){
+    [].forEach.call(s.querySelectorAll('[data-step]'),function(e){e.classList.add('shown')});
+    [].forEach.call(s.querySelectorAll('[data-count]'),function(e){var v=+e.dataset.count;e.textContent=e.dataset.dec?v.toFixed(+e.dataset.dec):v.toLocaleString('ko-KR')});
+    if(!s.hasAttribute('data-nofoot')&&!s.classList.contains('cover')){var f=document.createElement('div');f.className='foot';f.innerHTML='<span></span><b></b>';s.appendChild(f)}
+  });
+  var SHOW=[['표지',0],['카드',1],['간지',2],['메시지',3],['차트',4],['숫자',5],['목록',7],['표',9],['단계',10],['인용',11]],cur=0;
+  SHOW.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.textContent=t[0];b.onclick=function(){cur=i;draw()};$('tabs').appendChild(b)});
+  function fit(){var k=host.clientWidth/1600;stage.style.transform='scale('+k+')';stage.style.transformOrigin='0 0'}
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(host);addEventListener('resize',fit);
+
+  var loaded={};
+  function fonts(){C.fontInfo(cfg).links.forEach(function(h){if(loaded[h])return;loaded[h]=1;var l=document.createElement('link');l.rel='stylesheet';l.href=h;document.head.appendChild(l)})}
+
+  function brandOf(slug){return DATA.presets.brands.filter(function(b){return b.slug===slug})[0]||null}
+  function draw(){
+    cfg=C.normalize(cfg);fonts();
+    sh.getElementById('th').textContent=C.themeCss(cfg).replace(/:root/g,':host');
+    var a=C.stageAttrs(cfg);Object.keys(a).forEach(function(k){stage.setAttribute('data-'+k,a[k])});
+    slides.forEach(function(s,i){s.classList.toggle('on',i===SHOW[cur][1]);var f=s.querySelector('.foot');
+      if(f){f.firstChild.textContent=[cfg.title+' 견본',cfg.author,'2026. 11. 21.(토)'].filter(Boolean).join('  |  ');f.lastChild.textContent=('0'+(i+1)).slice(-2)+' / '+slides.length}});
+    var who=sh.querySelector('.thanks .who');if(who)who.textContent=cfg.author||'발표자 이름';
+    [].forEach.call($('tabs').children,function(b,i){b.setAttribute('aria-pressed',i===cur)});
+    fit();
+    // 폼 값 맞추기
+    ['preset','brand','ground','font','titleFont','radius','card','pattern','titlefx','motion','tone','script'].forEach(function(k){
+      [].forEach.call(document.querySelectorAll('input[name="'+k+'"]'),function(i){i.checked=(i.value===cfg[k])})});
+    ['key','point'].forEach(function(k){$(k+'-c').value=cfg[k];if(document.activeElement!==$(k+'-t'))$(k+'-t').value=cfg[k]});
+    ['title','name','author'].forEach(function(k){if(document.activeElement!==$(k))$(k).value=cfg[k]});
+    var t=C.tokens(cfg),n=$('key-note');
+    n.hidden=!t.keyMoved;if(t.keyMoved)n.textContent='고른 색 '+cfg.key+' 은 이 바탕에서 글자로 읽기 어려워 '+t.key+' 로 진하기를 맞췄습니다(본문 대비 4.5:1).';
+    var line=C.toLine(cfg);$('line').textContent=line;
+    [].forEach.call(document.querySelectorAll('.sk-name'),function(e){e.textContent=cfg.name});
+    [].forEach.call(document.querySelectorAll('.sk-title'),function(e){e.textContent=cfg.title});
+    try{localStorage.setItem('ppt-skill-cfg',line)}catch(e){}
+  }
+  $('f').addEventListener('change',function(e){
+    var t=e.target;if(t.type!=='radio')return;
+    if(t.name==='preset'){var p=PRESETS[t.value];cfg.preset=t.value;cfg.brand='';cfg.ground=p.ground;cfg.key=p.key;cfg.point=p.point;cfg.radius=p.radius}
+    else if(t.name==='brand'){var b=brandOf(t.value);cfg.preset='brand';cfg.brand=b.slug;cfg.ground='white';cfg.key=b.key;cfg.point=b.key;
+      var r=b.radii.length?b.radii.reduce(function(x,y){return Math.abs(y-12)<Math.abs(x-12)?y:x}):12;
+      cfg.radius=String(['0','8','12','20'].reduce(function(x,y){return Math.abs(y-r)<Math.abs(x-r)?y:x}));}
+    else cfg[t.name]=t.value;
+    draw();
+  });
+  ['key','point'].forEach(function(k){
+    $(k+'-c').addEventListener('input',function(){cfg[k]=this.value;draw()});
+    $(k+'-t').addEventListener('input',function(){var v=this.value.trim();if(v&&v.charAt(0)!=='#')v='#'+v;if(/^#[0-9a-fA-F]{6}$/.test(v)){cfg[k]=v;draw()}});
+  });
+  $('title').addEventListener('input',function(){cfg.title=this.value;draw()});
+  $('author').addEventListener('input',function(){cfg.author=this.value;draw()});
+  $('name').addEventListener('input',function(){var v=this.value.trim(),er=C.nameError(v),box=$('name-err');box.hidden=!er;box.textContent=er;if(!er){cfg.name=v;draw()}});
+  $('name').addEventListener('blur',function(){this.value=cfg.name;$('name-err').hidden=true});
+
+  $('copy').addEventListener('click',function(){
+    var text=$('line').textContent,ok=$('copied');
+    function done(){ok.hidden=false;setTimeout(function(){ok.hidden=true},2500)}
+    function select(){var r=document.createRange();r.selectNodeContents($('line'));var s=getSelection();s.removeAllRanges();s.addRange(r);ok.textContent='복사가 막혀 글자를 선택해 두었습니다. Ctrl+C 를 누르세요';done()}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){ok.textContent='복사했습니다';done()},select);else select();
+  });
+  /*__SAVE__*/
+  draw();
+})();
+</script>
