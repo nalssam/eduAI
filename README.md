@@ -55,9 +55,9 @@ npx skills add jkf87/hwpx-skill -g -a claude-code codex -y
 node skills/nalssam-html-ppt/scripts/make_skill.js "[HTML PPT 스킬 설정] name=class-ppt; title=우리반 발표; ground=white; key=#3182F6" out
 ```
 
-## 웹사이트로 올리기
+## 웹사이트
 
-`site/` 폴더가 그대로 정적 사이트다. Vercel·Netlify·GitHub Pages 어디든 `site` 를 루트로 지정하면 된다. 빌드 단계는 없다(만들어 둔 `index.html` 을 그대로 올린다).
+`site/` 폴더가 그대로 정적 사이트이고, `main` 에 `site/` 가 바뀌면 `.github/workflows/pages.yml` 이 GitHub Pages 로 올린다. 주소는 https://nalssam.github.io/eduAI/ 이다. 처음 한 번은 저장소 Settings > Pages 의 Source 가 "GitHub Actions" 여야 한다.
 
 ## 고칠 때
 
