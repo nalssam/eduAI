@@ -25,11 +25,12 @@ const TOOLS = [
   },
   {
     name: 'create_papercraft_worksheet',
-    description: '귀여운 3D 동물 페이퍼크래프트를 A4 한 장 학습지로 만든다(머리·몸통 직육면체 전개도 + 귀·꼬리 + 만드는 순서 + 완성 모습 + 탐구 활동). 인쇄용 HTML·SVG, 가능하면 PDF·PNG, 그리고 3D 접기 미리보기 HTML 을 저장한다. 프리셋 하나만 골라도 되고, 항목을 바꿔 새 동물을 만들 수도 있다.',
+    description: '귀여운 3D 동물 페이퍼크래프트를 A4 학습지로 만든다. 상자 스타일(머리·몸통 직육면체 + 귀·꼬리, 1쪽) 또는 다면체 스타일(tiger: 로우폴리 모형을 자동으로 펼친 번호 전개도, 2쪽). 만드는 순서·완성 모습·탐구 활동 포함. 인쇄용 HTML·SVG, 가능하면 PDF·PNG, 그리고 3D 접기 미리보기 HTML 을 저장한다. 프리셋 하나만 골라도 되고, 항목을 바꿔 새 동물을 만들 수도 있다.',
     inputSchema: {
       type: 'object',
       properties: {
-        preset: { type: 'string', enum: Object.keys(PRESETS), description: '출발점 동물. 가장 가까운 것을 고른 뒤 아래 항목으로 바꾼다.' },
+        preset: { type: 'string', enum: Object.keys(PRESETS), description: '출발점 동물. tiger 는 다면체(로우폴리) 스타일: 여러 조각으로 양감을 내는 고급형, A4 2쪽. 나머지는 상자 스타일(A4 1쪽).' },
+        pages: { type: 'number', description: '다면체 스타일의 최대 쪽 수(1~3, 기본 2). 1이면 작게 한 장에.' },
         label: { type: 'string', description: '동물 이름(예: 강아지). title 이 없으면 "OO 만들기" 로 쓴다.' },
         title: { type: 'string', description: '학습지 큰 제목(12자 안팎).' },
         subtitle: { type: 'string', description: '제목 아래 한 줄.' },
@@ -83,7 +84,7 @@ async function callTool(name, args = {}) {
     const r = await createPapercraft(spec, { outDir, render: render !== false });
     const preview = r.files.png ? imageContent(r.files.png) : [];
     return textResult({
-      message: `「${r.summary.title}」 학습지를 만들었어요. A4 한 장, 완성 높이 약 ${r.summary.finishedHeightCm}cm.`,
+      message: `「${r.summary.title}」 학습지를 만들었어요. A4 ${r.summary.pages}장, 완성 높이 약 ${r.summary.finishedHeightCm}cm.`,
       files: r.files, parts: r.summary.parts, scale: r.summary.scale, note: r.note || undefined,
       next: '가상 접기를 보여 주려면 render_fold_preview 에 files.fold 를 넘기세요. 인쇄는 files.pdf(없으면 files.html 을 브라우저에서 인쇄).',
     }, preview);

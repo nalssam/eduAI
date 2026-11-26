@@ -10,7 +10,8 @@ description: "귀여운 3D 동물 페이퍼크래프트(종이 공작) 전개도
 ## 흐름
 
 1. **무엇을 만들지 정한다.** 요청에 동물이 있으면 묻지 않고 만든다. 없으면 프리셋 중 하나를 권한다.
-   - 프리셋: cat, graycat, bunny, bear, panda, penguin, fox, raccoon, koala, hamster, chick, frog
+   - 상자 스타일(1쪽, 저학년용): cat, graycat, bunny, bear, panda, penguin, fox, raccoon, koala, hamster, chick, frog
+   - 다면체 스타일(2쪽, 고학년·고급형): tiger — 로우폴리 모형을 자동으로 펼쳐 번호 날개로 잇는다. "조각조각", "양감", "로우폴리", "다면체" 를 원하면 이쪽. 색을 바꿔 다른 고양잇과(표범·아기 사자 등)도 만든다(`colors`, 줄무늬 없애기는 `headPattern: "none"`).
    - 프리셋에 없는 동물(강아지·돼지·유니콘 등)은 `papercraft_style_guide` 를 읽고 가장 가까운 프리셋에서 출발해 `colors`·`ears`·`mask`·`tail`·`accessory` 등을 바꾼다. 예: 강아지 = bear + colors 크림/갈색, ears round, tail stub, accessory heart.
 2. **`create_papercraft_worksheet` 를 부른다.** `output_dir` 는 사용자가 열 수 있는 폴더(작업 폴더 아래 등)로 준다. 학년·수업이 수학이면 `activity: "math"`, 국어·창체면 `"story"`.
 3. **결과를 확인한다.** 돌려받은 PNG 를 보고 잘린 곳·겹친 곳이 없는지 본다.

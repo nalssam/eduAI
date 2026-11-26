@@ -4,26 +4,37 @@
 
 const { toSheet, PAGE } = require('./sheet');
 
+const GAP = 14;
+const pageX = (p) => (p.place.page || 0) * (PAGE.w + GAP);
 function modelData(build) {
+  const n = build.pages || 1; const SW = n * PAGE.w + (n - 1) * GAP;
   return {
-    sheet: { w: PAGE.w, h: PAGE.h },
+    sheet: { w: SW, h: PAGE.h },
     parts: build.parts.map((p) => ({
       id: p.id, kind: p.kind, name: p.name,
       place: p.place, bw: p.bw, bh: p.bh,
       anchor: p.anchor, assembly: p.assembly,
-      anchorSheet: toSheet(p, [p.anchor[0], -p.anchor[1]]),
+      anchorSheet: ((q) => [q[0] + pageX(p), q[1]])(toSheet(p, [p.anchor[0], -p.anchor[1]])),
       panels: p.panels.map((q) => ({
-        id: q.id, parent: q.parent, role: q.role, stage: q.stage,
+        id: q.id, parent: q.parent, role: q.role, stage: q.stage, angle: q.angle,
         hinge: q.hinge,
         poly: q.poly,
-        uv: q.poly.map((pt) => { const s = toSheet(p, pt); return [s[0] / PAGE.w, 1 - s[1] / PAGE.h]; }),
+        uv: q.poly.map((pt) => { const s = toSheet(p, pt); return [(s[0] + pageX(p)) / SW, 1 - s[1] / PAGE.h]; }),
       })),
     })),
-    height: (build.body ? build.body.h : 0) + build.head.h,
+    height: build.heightMm || ((build.body ? build.body.h : 0) + build.head.h),
   };
 }
 
-function foldViewerHtml(svg, build, s) {
+function combinedSvg(pages) {
+  if (!Array.isArray(pages)) pages = [pages];
+  const n = pages.length; const SW = n * PAGE.w + (n - 1) * GAP;
+  const inner = pages.map((p, i) => p.replace(/^<svg[^>]*>/, `<svg x="${i * (PAGE.w + GAP)}" y="0" width="${PAGE.w}" height="${PAGE.h}" viewBox="0 0 ${PAGE.w} ${PAGE.h}">`)).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SW} ${PAGE.h}" width="${SW}mm" height="${PAGE.h}mm">${inner}</svg>`;
+}
+
+function foldViewerHtml(pages, build, s) {
+  const svg = combinedSvg(pages);
   const data = JSON.stringify(modelData(build));
   const svgJson = JSON.stringify(svg);
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,14 +85,14 @@ sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -15
 scene.add(sun);
 
 // 학습지 텍스처
-const TW = 1680, TH = Math.round(TW * M.sheet.h / M.sheet.w);
+const TW = Math.min(4096, Math.round(1680 * M.sheet.w / 210)), TH = Math.round(TW * M.sheet.h / M.sheet.w);
 const cv = document.createElement('canvas'); cv.width = TW; cv.height = TH;
 const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
 await new Promise((res) => {
   const img = new Image();
   img.onload = () => { const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, TW, TH); g.drawImage(img, 0, 0, TW, TH); tex.needsUpdate = true; res(); };
   img.onerror = res;
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG.replace('width="210mm" height="297mm"', 'width="' + TW + '" height="' + TH + '"'));
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG.replace(/width="[0-9.]+mm" height="[0-9.]+mm"/, 'width="' + TW + '" height="' + TH + '"'));
 });
 
 const world = new THREE.Group(); scene.add(world);
@@ -129,22 +140,25 @@ for (const P of M.parts) {
       const r = new THREE.Vector3(cx - a[0], -(cy - a[1]), 0);
       sign = (axis.x * r.y - axis.y * r.x) < 0 ? 1 : -1;
     }
-    nodes[q.id] = { g, origin, axis, sign, q, target: q.role === 'tab' ? 94 : 90 };
+    if (q.angle != null && axis) { sign = 1; }
+    nodes[q.id] = { g, origin, axis, sign, q, target: q.angle != null ? q.angle : (q.role === 'tab' ? 94 : 90) };
     order.push(nodes[q.id]);
   }
   const a0 = sheetPos(P.anchorSheet[0], P.anchorSheet[1]); a0.z = P.anchor[2];
   const q0 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), P.place.rot ? -Math.PI / 2 : 0);
   const a1 = new THREE.Vector3(...P.assembly.pos);
-  const q1 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), P.assembly.rotY * Math.PI / 180);
+  const q1 = P.assembly.quat ? new THREE.Quaternion(...P.assembly.quat) : new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), P.assembly.rotY * Math.PI / 180);
   parts.push({ P, container, nodes: order, a0, q0, a1, q1 });
 }
 // 붙이는 순서: 몸통 → 머리 → 꼬리 → 귀
-const rank = (id) => id === 'body' ? 0 : id === 'head' ? 1 : id === 'tail' ? 2 : 3;
+const RANK = ['body', 'leg', 'arm', 'tail', 'head', 'ear'];
+const rank = (id) => { const i = RANK.findIndex((r) => id.startsWith(r)); return i < 0 ? 9 : i; };
 parts.sort((x, y) => rank(x.P.id) - rank(y.P.id));
 
 const H = M.height;
 const camA = { pos: new THREE.Vector3(0, -40, 600), look: new THREE.Vector3(0, 0, 0) };
-const camB = { pos: new THREE.Vector3(150, H * 1.25 + 60, 230), look: new THREE.Vector3(0, H * 0.5, 0) };
+function fitSheet() { const t = Math.tan(camera.fov * Math.PI / 360); const d = Math.max(M.sheet.h * 1.08 / (2 * t), M.sheet.w * 1.08 / (2 * t * camera.aspect)); camA.pos.set(0, -d * 0.07, d); }
+const camB = { pos: new THREE.Vector3(H * 1.2, H * 1.0 + 30, H * 1.85 + 10), look: new THREE.Vector3(0, H * 0.5, 0) };
 let yaw = 0, pitch = 0;
 
 function setT(t) {
@@ -179,7 +193,7 @@ function setT(t) {
 
 function resize() {
   const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
-  camera.aspect = w / h; camera.fov = w < h ? 46 : 32; camera.updateProjectionMatrix();
+  camera.aspect = w / h; camera.fov = w < h ? 46 : 32; camera.updateProjectionMatrix(); fitSheet();
 }
 addEventListener('resize', () => { resize(); setT(T); }); resize();
 

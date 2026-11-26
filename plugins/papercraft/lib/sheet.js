@@ -3,61 +3,77 @@
 
 const A = require('./art');
 const { buildParts } = require('./parts');
+const lowpoly = require('./lowpoly');
+const heightOf = (b) => b.heightMm || ((b.body ? b.body.h : 0) + b.head.h);
 const { f, polyD, el } = A;
 
 const PAGE = { w: 210, h: 297, margin: 8 };
 const MAIN = { x: 8, y: 41, w: 194, h: 197 };
 
-// ── MaxRects 배치 ──────────────────────────────────────────
-function packRects(items, bin, pad, preferUpright = true) {
-  let free = [{ x: bin.x, y: bin.y, w: bin.w, h: bin.h }];
+// ── MaxRects 배치(여러 쪽) ─────────────────────────────────
+const MAIN2 = { x: 8, y: 22, w: 194, h: 265 };
+
+function packRects(items, bins, pad, preferUpright = true) {
+  const frees = bins.map((bin) => [{ x: bin.x, y: bin.y, w: bin.w, h: bin.h }]);
   const placed = [];
   for (const it of items) {
     let best = null;
-    for (const rot of it.allowRot ? [0, 90] : [0]) {
-      if (best && preferUpright) break; // 돌리지 않고 들어가면 그대로 둔다
-      const w = (rot ? it.h : it.w) + pad, h = (rot ? it.w : it.h) + pad;
-      for (const fr of free) {
-        if (w <= fr.w + 1e-6 && h <= fr.h + 1e-6) {
-          const score = [fr.y + h, fr.x]; // 위·왼쪽부터 채우기
-          if (!best || score[0] < best.score[0] - 1e-6 || (Math.abs(score[0] - best.score[0]) < 1e-6 && score[1] < best.score[1])) best = { x: fr.x, y: fr.y, w, h, rot, score };
+    for (let page = 0; page < bins.length && !best; page++) {
+      for (const rot of it.allowRot ? [0, 90] : [0]) {
+        if (best && preferUpright) break; // 돌리지 않고 들어가면 그대로 둔다
+        const w = (rot ? it.h : it.w) + pad, h = (rot ? it.w : it.h) + pad;
+        for (const fr of frees[page]) {
+          if (w <= fr.w + 1e-6 && h <= fr.h + 1e-6) {
+            const score = [fr.y + h, fr.x]; // 위·왼쪽부터 채우기
+            if (!best || score[0] < best.score[0] - 1e-6 || (Math.abs(score[0] - best.score[0]) < 1e-6 && score[1] < best.score[1])) best = { x: fr.x, y: fr.y, w, h, rot, score, page };
+          }
         }
       }
     }
     if (!best) return null;
-    placed.push({ id: it.id, x: best.x + pad / 2, y: best.y + pad / 2, rot: best.rot });
+    placed.push({ id: it.id, x: best.x + pad / 2, y: best.y + pad / 2, rot: best.rot, page: best.page });
     const used = { x: best.x, y: best.y, w: best.w, h: best.h };
     const next = [];
-    for (const fr of free) {
+    for (const fr of frees[best.page]) {
       if (used.x >= fr.x + fr.w || used.x + used.w <= fr.x || used.y >= fr.y + fr.h || used.y + used.h <= fr.y) { next.push(fr); continue; }
       if (used.x > fr.x) next.push({ x: fr.x, y: fr.y, w: used.x - fr.x, h: fr.h });
       if (used.x + used.w < fr.x + fr.w) next.push({ x: used.x + used.w, y: fr.y, w: fr.x + fr.w - used.x - used.w, h: fr.h });
       if (used.y > fr.y) next.push({ x: fr.x, y: fr.y, w: fr.w, h: used.y - fr.y });
       if (used.y + used.h < fr.y + fr.h) next.push({ x: fr.x, y: used.y + used.h, w: fr.w, h: fr.y + fr.h - used.y - used.h });
     }
-    free = next.filter((a, i) => !next.some((b, j) => j !== i && a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h && (j < i || a.w !== b.w || a.h !== b.h || a.x !== b.x || a.y !== b.y)));
+    frees[best.page] = next.filter((a, i) => !next.some((b, j) => j !== i && a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h && (j < i || a.w !== b.w || a.h !== b.h || a.x !== b.x || a.y !== b.y)));
   }
-  return { placed, free };
+  return { placed, frees };
 }
 
 function layout(spec) {
-  for (let scale = 1.3; scale > 0.35; scale -= 0.02) {
-    const build = buildParts(spec, scale);
+  const lp = spec.style === 'lowpoly';
+  const maxPages = lp ? Math.max(1, Math.min(3, spec.pages || 2)) : 1;
+  for (let scale = lp ? 1.0 : 1.3; scale > 0.3; scale -= 0.02) {
+    const build = lp ? lowpoly.buildParts(spec, scale) : buildParts(spec, scale);
     const items = build.parts.map((p) => ({ id: p.id, w: p.bw, h: p.bh, allowRot: true }));
-    const res = packRects(items, MAIN, 3.2, true) || packRects(items, MAIN, 3.2, false);
+    let res = null;
+    for (let n = 1; n <= maxPages && !res; n++) {
+      const bins = [MAIN, ...Array(n - 1).fill(MAIN2)];
+      res = packRects(items, bins, 3.2, true) || packRects(items, bins, 3.2, false);
+    }
     if (res) {
-      // 가로 가운데 맞춤
-      const right = Math.max(...res.placed.map((pl) => { const p = build.parts.find((q) => q.id === pl.id); return pl.x + (pl.rot ? p.bh : p.bw); }));
-      const dx = Math.max(0, (MAIN.x + MAIN.w - right) / 2);
-      for (const pl of res.placed) pl.x += dx;
+      const pages = Math.max(...res.placed.map((pl) => pl.page)) + 1;
+      for (let pg = 0; pg < pages; pg++) {
+        const mine = res.placed.filter((pl) => pl.page === pg);
+        const right = Math.max(...mine.map((pl) => { const p = build.parts.find((q) => q.id === pl.id); return pl.x + (pl.rot ? p.bh : p.bw); }));
+        const dx = Math.max(0, (MAIN.x + MAIN.w - right) / 2);
+        for (const pl of mine) pl.x += dx;
+      }
       for (const pl of res.placed) {
         const p = build.parts.find((q) => q.id === pl.id);
-        p.place = { x: pl.x, y: pl.y, rot: pl.rot };
+        p.place = { x: pl.x, y: pl.y, rot: pl.rot, page: pl.page };
       }
-      return { build, free: res.free };
+      build.pages = pages;
+      return { build, frees: res.frees.slice(0, pages) };
     }
   }
-  throw new Error('부품이 A4 한 장에 들어가지 않아요. 크기를 줄여 주세요.');
+  throw new Error('부품이 A4 에 들어가지 않아요. 크기를 줄여 주세요.');
 }
 
 function placeTransform(p) {
@@ -133,7 +149,7 @@ function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').
 function text(x, y, t, size, fill, extra = '') { return `<text x="${f(x)}" y="${f(y)}" font-size="${f(size)}" fill="${fill}" ${extra}>${esc(t)}</text>`; }
 function sparkle(cx, cy, r, fill) { return el.path(`M${f(cx)},${f(cy - r)}Q${f(cx + r * 0.18)},${f(cy - r * 0.18)} ${f(cx + r)},${f(cy)}Q${f(cx + r * 0.18)},${f(cy + r * 0.18)} ${f(cx)},${f(cy + r)}Q${f(cx - r * 0.18)},${f(cy + r * 0.18)} ${f(cx - r)},${f(cy)}Q${f(cx - r * 0.18)},${f(cy - r * 0.18)} ${f(cx)},${f(cy - r)}Z`, fill); }
 
-function header(s, theme) {
+function header(s, theme, build = {}) {
   let o = '';
   const ink = s.colors.ink;
   o += `<rect x="8" y="8" width="118" height="27" rx="6" fill="${theme.soft}"/>`;
@@ -152,7 +168,11 @@ function header(s, theme) {
   o += `<line x1="134" y1="${ly}" x2="144" y2="${ly}" stroke="${ink}" stroke-width="0.55"/>` + text(146, ly + 1.2, '자르는 선', 3.1, ink, `font-family="${FONT_BODY}"`);
   o += `<line x1="167" y1="${ly}" x2="177" y2="${ly}" stroke="#7A6A66" stroke-width="0.4" stroke-dasharray="1.6 1.1"/>` + text(179, ly + 1.2, '접는 선', 3.1, ink, `font-family="${FONT_BODY}"`);
   o += `<path d="M134,${ly + 8.6}L135.8,${ly + 5.2}L142.2,${ly + 5.2}L144,${ly + 8.6}Z" fill="#F6F2EC" stroke="${ink}" stroke-width="0.4"/>` + text(146, ly + 8.2, '풀칠하는 날개', 3.1, ink, `font-family="${FONT_BODY}"`);
-  o += `<rect x="168" y="${ly + 5.2}" width="9" height="3.4" rx="0.5" fill="#FFFFFF" stroke="#9C8F8F" stroke-width="0.3" stroke-dasharray="0.9 0.7"/>` + text(179, ly + 8.2, '붙이는 자리', 3.1, ink, `font-family="${FONT_BODY}"`);
+  if (build.style === 'lowpoly') {
+    o += `<line x1="167" y1="${ly + 6.9}" x2="177" y2="${ly + 6.9}" stroke="#2F6FA8" stroke-width="0.45" stroke-dasharray="2 0.7 0.4 0.7"/>` + text(179, ly + 8.2, '안으로 접기', 3.1, ink, `font-family="${FONT_BODY}"`);
+  } else {
+    o += `<rect x="168" y="${ly + 5.2}" width="9" height="3.4" rx="0.5" fill="#FFFFFF" stroke="#9C8F8F" stroke-width="0.3" stroke-dasharray="0.9 0.7"/>` + text(179, ly + 8.2, '붙이는 자리', 3.1, ink, `font-family="${FONT_BODY}"`);
+  }
   return o;
 }
 
@@ -166,7 +186,7 @@ function footer(s, build, theme) {
   const hasEars = build.parts.some((p) => p.id.startsWith('ear'));
   const hasTail = build.parts.some((p) => p.id === 'tail');
   const extra = [hasEars ? '귀' : null, hasTail ? '꼬리' : null].filter(Boolean).join('·');
-  const steps = [
+  const steps = build.steps || [
     '굵은 실선을 따라 오려요.',
     '점선을 모두 안쪽으로 꾹꾹 접어요.',
     "'풀' 날개에 풀칠해서 상자를 닫아요.",
@@ -181,10 +201,21 @@ function footer(s, build, theme) {
   // 완성 모습
   o += text(col[1].x + col[1].w / 2, y0 + 7, '완성 모습', 4.2, ink, `text-anchor="middle" font-family="${FONT_TITLE}"`);
   o += `<rect x="${col[1].x + 3}" y="${y0 + 10}" width="${col[1].w - 6}" height="${h - 13}" rx="3" fill="#FFFFFF"/>`;
-  o += previewSvg(build, s, { x: col[1].x + 3, y: y0 + 11, w: col[1].w - 6, h: h - 14 });
+  const pbox = { x: col[1].x + 3, y: y0 + 11, w: col[1].w - 6, h: h - 14 };
+  if (build.previewSvg) o += build.previewSvg(pbox, ink); else o += previewSvg(build, s, { x: col[1].x + 3, y: y0 + 11, w: col[1].w - 6, h: h - 14 });
   // 탐구 활동
   const cx = col[2].x + 4;
-  if (s.activity === 'math') {
+  if (s.activity === 'math' && build.math) {
+    o += text(cx, y0 + 7, build.math.title, 4.2, ink, `font-family="${FONT_TITLE}"`);
+    build.math.rows.forEach(([a, b], i) => {
+      const yy = y0 + 14.5 + i * 6.4;
+      o += text(cx, yy, a, 3.2, ink, `font-family="${FONT_BODY}"`);
+      const bx = cx + 41;
+      o += `<rect x="${bx}" y="${yy - 3.6}" width="10" height="5" rx="1.2" fill="#FFFFFF" stroke="${theme.line}" stroke-width="0.35"/>`;
+      o += text(bx + 11.5, yy, b, 3.2, ink, `font-family="${FONT_BODY}"`);
+    });
+    build.math.note.forEach((t, i) => { o += text(cx, y0 + 41.5 + i * 3.8, t, 2.9, A.shade(ink, -0.2), `font-family="${FONT_BODY}"`); });
+  } else if (s.activity === 'math') {
     o += text(cx, y0 + 7, '📐 직육면체 탐구', 4.2, ink, `font-family="${FONT_TITLE}"`);
     const q = [
       ['머리 상자의 면은', '개'],
@@ -234,20 +265,32 @@ function themeFor(s) {
   return { soft: A.mix(accent, '#FFFFFF', 0.86), accent, line: A.mix(accent, '#FFFFFF', 0.45) };
 }
 
-function makeSheet(spec) {
-  const { build, free } = layout(spec);
-  const theme = themeFor(spec);
-  let parts = '';
-  for (const p of build.parts) parts += `<g id="part-${p.id}" transform="${placeTransform(p)}">${p.svg}</g>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAGE.w} ${PAGE.h}" width="${PAGE.w}mm" height="${PAGE.h}mm">`
-    + `<rect width="${PAGE.w}" height="${PAGE.h}" fill="#FFFFFF"/>`
-    + header(spec, theme)
-    + sprinkles(free, theme, spec.seed)
-    + parts
-    + footer(spec, build, theme)
-    + text(PAGE.w / 2, 294, `완성 크기: 높이 약 ${(((build.body ? build.body.h : 0) + build.head.h) / 10).toFixed(1)}cm · 두꺼운 종이에 실제 크기(100%)로 인쇄하세요`, 2.5, '#A79A94', `text-anchor="middle" font-family="${FONT_BODY}"`)
-    + `</svg>`;
-  return { svg, build, theme };
+function miniHeader(s, theme, pg, total) {
+  return `<rect x="8" y="7" width="194" height="11" rx="4" fill="${theme.soft}"/>`
+    + text(13, 14.6, `${s.title}`, 5, s.colors.ink, `font-family="${FONT_TITLE}"`)
+    + text(197, 14.4, `${pg + 1} / ${total} 쪽 · 같은 번호끼리 붙여요`, 3, A.shade(s.colors.ink, -0.25), `text-anchor="end" font-family="${FONT_BODY}"`);
 }
 
-module.exports = { makeSheet, layout, toSheet, PAGE, MAIN };
+function makeSheet(spec) {
+  const { build, frees } = layout(spec);
+  const theme = themeFor(spec);
+  const pages = [];
+  for (let pg = 0; pg < build.pages; pg++) {
+    let parts = '';
+    for (const p of build.parts.filter((q) => q.place.page === pg)) parts += `<g id="part-${p.id}" transform="${placeTransform(p)}">${p.svg}</g>`;
+    const first = pg === 0;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAGE.w} ${PAGE.h}" width="${PAGE.w}mm" height="${PAGE.h}mm">`
+      + (build.defs ? `<defs>${build.defs}</defs>` : '')
+      + `<rect width="${PAGE.w}" height="${PAGE.h}" fill="#FFFFFF"/>`
+      + (first ? header(spec, theme, build) : miniHeader(spec, theme, pg, build.pages))
+      + sprinkles(frees[pg], theme, spec.seed + pg)
+      + parts
+      + (first ? footer(spec, build, theme) : '')
+      + text(PAGE.w / 2, 294, `완성 크기: 높이 약 ${(heightOf(build) / 10).toFixed(1)}cm · 두꺼운 종이에 실제 크기(100%)로 인쇄하세요${build.pages > 1 ? ` · ${pg + 1}/${build.pages}쪽` : ''}`, 2.5, '#A79A94', `text-anchor="middle" font-family="${FONT_BODY}"`)
+      + `</svg>`;
+    pages.push(svg);
+  }
+  return { svg: pages[0], pages, build, theme };
+}
+
+module.exports = { makeSheet, layout, toSheet, PAGE, MAIN, MAIN2 };

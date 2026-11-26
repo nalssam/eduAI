@@ -7,7 +7,10 @@
 
 - 큰 머리 + 작은 몸통 직육면체 두 개, 귀·꼬리는 날개를 접어 붙이는 귀염 스타일(레퍼런스에서 뽑은 규칙: `skills/papercraft/references/style-guide.md`)
 - 학습지 한 장: 제목·이름 칸·범례 / 전개도 / 만드는 순서·완성 모습·탐구 활동(직육면체의 면·모서리·꼭짓점, 초5 수학)
-- 프리셋 12종: cat, graycat, bunny, bear, panda, penguin, fox, raccoon, koala, hamster, chick, frog — 색·귀·얼굴 무늬·꼬리·장식을 바꿔 새 동물도 만든다
+- **상자 스타일**(1쪽) 12종: cat, graycat, bunny, bear, panda, penguin, fox, raccoon, koala, hamster, chick, frog — 색·귀·얼굴 무늬·꼬리·장식을 바꿔 새 동물도 만든다
+- **다면체(로우폴리) 스타일**(2쪽): tiger — 3D 모형을 자동으로 펼쳐(겹침 검사·번호 날개·산/골 접기) 조각조각 양감 있는 인형을 만든다
+
+![다면체 호랑이](examples/papercraft-tiger-worksheet.png)
 - 나오는 것: 인쇄용 HTML·SVG·PDF·PNG, 3D 접기 HTML, 접기 장면표·MP4·GIF
 - 의존성 없음(Node 18+). PDF·PNG·영상은 Playwright(+ffmpeg) 가 있으면 자동으로 만든다
 
@@ -52,5 +55,6 @@ node test/smoke.js ./out cat     # MCP 로 만들고 접어 보는 시험
 | `lib/parts.js` | 상자 전개도·풀칠 날개·경첩, 조립 위치 |
 | `lib/sheet.js` | A4 배치(MaxRects, 자동 축소)·머리띠·아래 칸·완성 투상도 |
 | `lib/fold.js` | 같은 경첩 데이터로 접는 three.js 미리보기 |
+| `lib/lowpoly/` | 다면체 모형(`models.js`), 자동 펼치기·날개·접는 각(`unfold.js`), 면 그림·번호·완성 투상(`index.js`) |
 | `lib/foldrender.js` · `lib/output.js` | PNG·PDF·영상 내보내기 |
 | `server/mcp.js` | stdio MCP 서버 |

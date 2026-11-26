@@ -76,6 +76,13 @@ const PRESETS = {
   },
 };
 
+PRESETS.tiger = {
+  style: 'lowpoly', label: '호랑이', title: '아기 호랑이 만들기',
+  colors: { main: '#F4A04A', light: '#FFF4E4', accent: '#3E2B22', inner: '#F6A9B6' },
+  ears: 'cat', eyes: 'sparkle', nose: 'cat', mouth: 'w', whiskers: false,
+  mask: 'muzzle', headPattern: 'tabby', bodyPattern: 'belly', tail: 'cat', accessory: 'none',
+};
+
 const ENUMS = {
   ears: ['cat', 'fox', 'round', 'long', 'koala', 'tuft', 'frog', 'none'],
   eyes: ['sparkle', 'dot', 'happy', 'wink'],
@@ -102,9 +109,10 @@ function normalizeSpec(input = {}) {
   const colors = { cheek: '#F7A1B0', ink: '#3B2E2E', ...p.colors, ...(input.colors || {}) };
   const s = {
     preset: presetKey,
+    style: p.style || 'box',
     label: input.label || p.label,
     title: input.title || (input.label ? `${input.label} 만들기` : p.title),
-    subtitle: input.subtitle || '자르고 · 접고 · 붙여서 나만의 3D 친구 완성!',
+    subtitle: input.subtitle || (p.style === 'lowpoly' ? '조각조각 이어 붙여 통통한 3D 친구 완성!' : '자르고 · 접고 · 붙여서 나만의 3D 친구 완성!'),
     colors,
     earColor: input.earColor || p.earColor || colors.main,
     ears: pick(input.ears, ENUMS.ears, p.ears),
@@ -124,6 +132,7 @@ function normalizeSpec(input = {}) {
     head: { ...DEFAULT_DIMS.head, ...(input.head || {}) },
     bodyDims: { ...DEFAULT_DIMS.body, ...(input.bodyDims || {}) },
     seed: Number.isFinite(input.seed) ? input.seed : 7,
+    pages: Number.isFinite(input.pages) ? input.pages : undefined,
   };
   return s;
 }
