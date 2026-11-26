@@ -28,6 +28,7 @@ Claude 앱에는 `site/downloads/` 의 스킬별 ZIP 을 설정 > 기능(코드 
 | [`skills/nalssam-pptx`](skills/nalssam-pptx/SKILL.md) | 날쌤 스타일 연수 원고 PPTX. 공개판(제안서·IR 모드와 개인 프로필 상수 제외) |
 | [`skills/pdf`](skills/pdf/SKILL.md) | PDF 읽기·합치기·나누기·양식 채우기. [anthropics/skills](https://github.com/anthropics/skills) 의 것을 그대로 담았다(Apache 2.0, `LICENSE.txt`) |
 | [`skills/kordoc`](skills/kordoc/SKILL.md) | 한글(.hwp·.hwpx)·PDF·오피스 문서 읽기, 공문서 HWPX 생성, 서식 채우기. [chrisryugj/kordoc](https://github.com/chrisryugj/kordoc) 의 스킬을 그대로 담았다(MIT, `LICENSE`·`NOTICE`). Node.js 20 이상 필요 |
+| [`plugins/papercraft`](plugins/papercraft/README.md) | 귀여운 3D 동물 페이퍼크래프트 A4 학습지 + 3D 가상 접기. 스킬과 MCP 서버가 든 Claude Code 플러그인(`/plugin marketplace add nalssam/eduAI` → `/plugin install papercraft@nalssam`). 다른 MCP 클라이언트에도 붙는다 |
 | [`site/index.html`](site/index.html) | 분필팩 첫 화면: 한 줄 설치, 스킬별 ZIP, 붙이는 법 |
 | [`site/builder.html`](site/builder.html) | 스타일 고르기 판. 색·글꼴·모양을 고르면 나만의 스킬 ZIP 이 내려온다 |
 | `site/pack-artifact.html` · `site/artifact.html` | 두 화면의 Claude 아티팩트용. `downloads` 권한을 켜고 올린다 |
